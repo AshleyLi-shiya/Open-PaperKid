@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to PaperKid are documented here. PaperKid follows [Semantic Versioning](https://semver.org/).
+All notable changes to Open-PaperKid are documented here. Open-PaperKid follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
@@ -46,6 +46,6 @@ All notable changes to PaperKid are documented here. PaperKid follows [Semantic 
 - Basic Docker Compose for self-host with Ollama.
 - `ARCHITECTURE.md`, `SETUP.md`, `PROMPTS.md`.
 
-[Unreleased]: https://github.com/AshleyLi-shiya/paperkid/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/AshleyLi-shiya/paperkid/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/AshleyLi-shiya/paperkid/releases/tag/v0.1.0
+[Unreleased]: https://github.com/AshleyLi-shiya/Open-PaperKid/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/AshleyLi-shiya/Open-PaperKid/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/AshleyLi-shiya/Open-PaperKid/releases/tag/v0.1.0

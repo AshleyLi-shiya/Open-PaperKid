@@ -2,7 +2,7 @@
 
 _Last updated: 2026-09-19_
 
-PaperKid is an open-source, BYOK (Bring Your Own Key) paper assistant. This document explains what data we collect and what we don't.
+Open-PaperKid is an open-source, BYOK (Bring Your Own Key) paper assistant. This document explains what data we collect and what we don't.
 
 ## TL;DR
 
@@ -15,13 +15,13 @@ PaperKid is an open-source, BYOK (Bring Your Own Key) paper assistant. This docu
 
 | Data | Where |
 |------|-------|
-| API key (`sk-…`) | Your browser's `chrome.storage.local` only. Never sent anywhere except your configured PaperKid server as a per-request header. |
-| Paper PDFs you upload | Your local PaperKid server (`.paperkid-data/pdfs/`). |
-| Extracted text + RAG vectors | Your local PaperKid server (`.paperkid-data/papers/`). |
-| Summaries / Q&A history | Your local PaperKid server (`.paperkid-data/papers/<id>/`). |
+| API key (`sk-…`) | Your browser's `chrome.storage.local` only. Never sent anywhere except your configured Open-PaperKid server as a per-request header. |
+| Paper PDFs you upload | Your local Open-PaperKid server (`.open-paperkid-data/pdfs/`). |
+| Extracted text + RAG vectors | Your local Open-PaperKid server (`.open-paperkid-data/papers/`). |
+| Summaries / Q&A history | Your local Open-PaperKid server (`.open-paperkid-data/papers/<id>/`). |
 | LLM API calls | Sent from your server to your chosen provider (OpenAI / Anthropic / DeepSeek / Ollama). Subject to that provider's own privacy policy. |
 
-## What the PaperKid server logs
+## What the Open-PaperKid server logs
 
 By default, the server logs:
 
@@ -51,7 +51,7 @@ The extension requests these permissions, used only as described:
 
 - `storage` — store your API key and preferences locally.
 - `sidePanel` — show the Q&A UI alongside paper pages.
-- `contextMenus` — "Summarize with PaperKid" right-click menu on arxiv links.
+- `contextMenus` — "Summarize with Open-PaperKid" right-click menu on arxiv links.
 - `activeTab`, `scripting` — inject the summarize button on paper pages.
 - Host permissions for `arxiv.org`, `openreview.net`, `huggingface.co/papers`, `localhost`, `127.0.0.1` — for fetching pages and talking to your local server.
 
@@ -63,12 +63,12 @@ The extension does **not**:
 
 Because we have no central server:
 - **No "delete my account"** — there is no account.
-- **No data export from us** — all your data is on your own disk. You can `rm -rf .paperkid-data` at any time.
+- **No data export from us** — all your data is on your own disk. You can `rm -rf .open-paperkid-data` at any time.
 - **No data portability from us** — same as above.
 
 ## Children's privacy
 
-PaperKid does not knowingly target children under 13. Since we collect no data, COPPA / GDPR-K compliance is achieved by construction.
+Open-PaperKid does not knowingly target children under 13. Since we collect no data, COPPA / GDPR-K compliance is achieved by construction.
 
 ## Changes to this policy
 

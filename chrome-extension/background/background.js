@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "pk-arxiv-import",
-    title: "用 PaperKid 总结这篇论文",
+    title: "用 Open-PaperKid 总结这篇论文",
     contexts: ["link"],
     targetUrlPatterns: ["https://arxiv.org/abs/*"],
   });

@@ -1,12 +1,12 @@
-# Contributing to PaperKid
+# Contributing to Open-PaperKid
 
-Thanks for your interest! PaperKid is intentionally small and friendly to first-time contributors.
+Thanks for your interest! Open-PaperKid is intentionally small and friendly to first-time contributors.
 
 ## Development setup
 
 ```bash
-git clone https://github.com/AshleyLi-shiya/paperkid.git
-cd paperkid
+git clone https://github.com/AshleyLi-shiya/Open-PaperKid.git
+cd Open-PaperKid
 cd server && npm install && npm run dev   # backend at :5174
 cd ../chrome-extension                     # open chrome://extensions → load unpacked
 ```

@@ -3,7 +3,14 @@
 
 export type Language = "zh" | "en" | "both";
 
-export type LlmBackend = "ollama" | "openai" | "anthropic";
+export type LlmBackend =
+  | "openai"
+  | "anthropic"
+  | "deepseek"
+  | "qwen"
+  | "kimi"
+  | "glm"
+  | "ollama";
 
 export interface PaperSection {
   title: string;

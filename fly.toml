@@ -1,7 +1,7 @@
 # Fly.io configuration
 # Docs: https://fly.io/docs/reference/configuration/
 
-app = "paperkid-YOURNAME"
+app = "open-paperkid-YOURNAME"
 primary_region = "nrt"
 
 [build]
@@ -13,7 +13,7 @@ primary_region = "nrt"
   NODE_ENV = "production"
 
 [mounts]
-  source = "paperkid_data"
+  source = "open_paperkid_data"
   destination = "/data"
 
 [[services]]

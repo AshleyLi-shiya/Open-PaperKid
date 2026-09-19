@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <title>PaperKid · 设置</title>
+  <title>Open-PaperKid · 设置</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -42,13 +42,13 @@
   </style>
 </head>
 <body>
-  <h1>PaperKid 设置<span class="badge">BYOK</span></h1>
-  <p>PaperKid 默认通过你自己的 API Key 调用大模型。Key 只保存在本浏览器本地存储,不发送到任何第三方服务器,也不写日志。</p>
+  <h1>Open-PaperKid 设置<span class="badge">BYOK</span></h1>
+  <p>Open-PaperKid 默认通过你自己的 API Key 调用大模型。Key 只保存在本浏览器本地存储,不发送到任何第三方服务器,也不写日志。</p>
 
   <h2>1. 服务器地址</h2>
   <label for="apiBase">后端 API 地址</label>
   <input type="text" id="apiBase" placeholder="http://localhost:5174" />
-  <div class="hint">本地默认:<code>http://localhost:5174</code>。如果你部署到了云端(参见 <a href="https://github.com/USER/paperkid/blob/main/docs/DEPLOY.md" target="_blank">DEPLOY.md</a>),填完整的 https URL。</div>
+  <div class="hint">本地默认:<code>http://localhost:5174</code>。如果你部署到了云端(参见 <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/DEPLOY.md" target="_blank">DEPLOY.md</a>),填完整的 https URL。</div>
 
   <h2>2. 模型 Provider</h2>
   <label for="provider">选择 Provider</label>
@@ -69,7 +69,7 @@
     <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
     <button type="button" class="toggle-vis" id="toggleVis">显示</button>
   </div>
-  <div class="hint">本扩展只把 Key 发给你配置的 PaperKid 后端,绝不发送到任何第三方(包括本项目作者)。</div>
+  <div class="hint">本扩展只把 Key 发给你配置的 Open-PaperKid 后端,绝不发送到任何第三方(包括本项目作者)。</div>
 
   <h2>4. 测试连接</h2>
   <button id="testBtn" class="primary">发送一次 ping 测试</button>
@@ -81,7 +81,7 @@
   </div>
 
   <div class="footer">
-    <p>PaperKid · MIT License · <a href="https://github.com/USER/paperkid" target="_blank">GitHub</a> · <a href="https://github.com/USER/paperkid/blob/main/docs/PRIVACY.md" target="_blank">隐私政策</a></p>
+    <p>Open-PaperKid · MIT License · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid" target="_blank">GitHub</a> · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/PRIVACY.md" target="_blank">隐私政策</a></p>
   </div>
 
   <script type="module" src="options.js"></script>

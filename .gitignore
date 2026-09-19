@@ -1,6 +1,6 @@
 node_modules/
 dist/
-.paperkid-data/
+.open-paperkid-data/
 .env
 *.log
 .DS_Store

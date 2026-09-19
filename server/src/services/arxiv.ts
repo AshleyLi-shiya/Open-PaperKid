@@ -52,7 +52,7 @@ export async function downloadArxivPdf(arxivId: string, destDir?: string): Promi
   const meta = await fetchArxivMeta(arxivId);
   const id = await paperIdFromArxiv(arxivId);
   const dest = destDir ?? storage.pdfPath(id);
-  const res = await fetch(meta.pdfUrl, { headers: { "user-agent": "PaperKid/0.1" } });
+  const res = await fetch(meta.pdfUrl, { headers: { "user-agent": "Open-PaperKid/0.1" } });
   if (!res.ok) throw new Error(`Failed to download ${meta.pdfUrl}: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
   await writeFile(dest, buf);

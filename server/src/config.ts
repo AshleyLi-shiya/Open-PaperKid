@@ -29,7 +29,7 @@ export const config: ServerConfig = {
     ollamaBaseUrl: envOrDefault("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
     apiKey: process.env.OPENAI_API_KEY || undefined,
   },
-  storageDir: envOrDefault("STORAGE_DIR", "./.paperkid-data"),
+  storageDir: envOrDefault("STORAGE_DIR", "./.open-paperkid-data"),
   maxPdfPages: envIntOrDefault("MAX_PDF_PAGES", 40),
   maxChunkTokens: envIntOrDefault("MAX_CHUNK_TOKENS", 800),
 };

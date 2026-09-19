@@ -2,7 +2,7 @@
 
 ## 总览
 
-PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScript）和 **Chrome 扩展**（MV3，无构建步骤）。两者通过 HTTP / REST 通信。
+Open-PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScript）和 **Chrome 扩展**（MV3，无构建步骤）。两者通过 HTTP / REST 通信。
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -23,13 +23,14 @@ PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScri
                         │ HTTP REST
                         ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                PaperKid 后端（用户机器或云）                  │
+│                Open-PaperKid 后端（用户机器或云）                  │
 │                                                              │
 │   ┌──────────┐   ┌──────────────┐   ┌──────────────────┐   │
 │   │ Express  │──▶│ ProviderContext│──▶│ LLM 客户端        │   │
 │   │ + CORS   │   │ (每请求新建)   │   │ Ollama / OpenAI  │   │
 │   │ + 限流   │   │ Key 不持久化   │   │ / Anthropic /    │   │
-│   └────┬─────┘   └──────────────┘   │ DeepSeek         │   │
+│   └────┬─────┘   └──────────────┘   │ DeepSeek / Qwen  │   │
+│        │                            │ / Kimi / GLM     │   │
 │        │                            └──────────────────┘   │
 │        ▼                                                    │
 │   ┌─────────────┐  ┌──────────┐  ┌────────────┐             │
@@ -38,7 +39,7 @@ PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScri
 │   └─────────────┘  └──────────┘  └────────────┘             │
 │                                                              │
 │   ┌──────────────────────────────────────────────────┐      │
-│   │  Storage (.paperkid-data/papers/...)            │      │
+│   │  Storage (.open-paperkid-data/papers/...)            │      │
 │   └──────────────────────────────────────────────────┘      │
 └──────────────────────────────────────────────────────────────┘
                         │
@@ -55,7 +56,7 @@ PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScri
 | 旧版 (v0.1) | 新版 (v0.2) |
 |--------------|-------------|
 | 服务端从 `apikey.ini` / 环境变量读 Key | 服务端**完全不持有 Key**,从 header 读 |
-| 单 provider(OpenAI) | 多 provider 注册中心(OpenAI/Anthropic/DeepSeek/Ollama) |
+| 单 provider(OpenAI) | 多 provider 注册中心(OpenAI/Anthropic/DeepSeek/Qwen/Kimi/GLM/Ollama) |
 | 单一 `llm` 全局实例 | 每个请求一个 `LlmClient`(`providerContext.ts`) |
 | 用户改 Key 需要重启服务 | 用户在扩展设置页改 Key,**立即生效**,无重启 |
 | CORS 开放 | CORS 锁定到扩展 origin + 用户配置的 https 域 |
@@ -65,7 +66,7 @@ PaperKid 拆成两块可独立运行的代码:**后端服务**（Node + TypeScri
 
 ### `server/src/services/llm.ts`
 - **Provider 注册中心**:`PROVIDERS` 字典描述每个 provider 的 id、推荐模型、是否需要 Key、默认 base URL
-- **三个 client 实现**:`OpenAICompatClient`(覆盖 OpenAI / DeepSeek / 任意 OpenAI 兼容代理)、`AnthropicClient`、`OllamaClient`
+- **三个 client 实现**:`OpenAICompatClient`(覆盖 OpenAI / DeepSeek / Qwen / Kimi / GLM / 任意 OpenAI 兼容代理)、`AnthropicClient`、`OllamaClient`
 - **`resolveProvider()`**:从原始输入规范化 Provider 配置
 - **`createClientFor()`**:工厂方法,返回 `LlmClient`
 - **`validateProvider()`**:做一个最小 ping,验证 Key 是否有效

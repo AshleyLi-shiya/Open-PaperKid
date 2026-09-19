@@ -139,7 +139,7 @@ async function main() {
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>PaperKid API</title>
+  <title>Open-PaperKid API</title>
   <style>
     body{font-family:system-ui,-apple-system,sans-serif;max-width:680px;margin:48px auto;padding:0 16px;line-height:1.6;color:#1a1a1a}
     code{background:#f3f3f3;padding:1px 6px;border-radius:4px;font-size:13px}
@@ -148,13 +148,13 @@ async function main() {
   </style>
 </head>
 <body>
-  <h1>PaperKid API</h1>
+  <h1>Open-PaperKid API</h1>
   <p>
     <span class="badge">v0.2.0</span>
     <span class="badge">BYOK</span>
     <span class="badge">Open Source · MIT</span>
   </p>
-  <p>This is the PaperKid backend. Most users should install the <a href="https://github.com/AshleyLi-shiya/paperkid">Chrome extension</a> and configure their API key in the extension settings.</p>
+  <p>This is the Open-PaperKid backend. Most users should install the <a href="https://github.com/AshleyLi-shiya/paperkid">Chrome extension</a> and configure their API key in the extension settings.</p>
   <h2>Quick reference</h2>
   <ul>
     <li><code>GET  /api/health</code></li>
@@ -186,7 +186,7 @@ async function main() {
 
   app.listen(config.port, () => {
     // eslint-disable-next-line no-console
-    console.log(`PaperKid server listening on http://localhost:${config.port}`);
+    console.log(`Open-PaperKid server listening on http://localhost:${config.port}`);
     // eslint-disable-next-line no-console
     console.log("LLM provider is chosen per-request via X-Paperkid-Provider header (default: openai).");
   });

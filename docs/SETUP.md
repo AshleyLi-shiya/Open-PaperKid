@@ -1,6 +1,6 @@
 # 快速上手
 
-PaperKid v0.2 起采用 **BYOK**(用户自带 Key)模式。服务端**永不**保存你的 API Key,Key 只在你浏览器的 `chrome.storage.local` 里。
+Open-PaperKid v0.2 起采用 **BYOK**(用户自带 Key)模式。服务端**永不**保存你的 API Key,Key 只在你浏览器的 `chrome.storage.local` 里。
 
 ## 三种用户路径
 
@@ -18,7 +18,7 @@ cd server && npm install && npm run dev        # 开发
 # 右键扩展图标 → 选项 → 选 OpenAI → 填 sk-xxx → 测一次 ping
 
 # 4. 使用
-# 打开 arxiv.org/abs/xxxx.xxx → 右下角 📘 PaperKid 总结 → 侧边栏看结果
+# 打开 arxiv.org/abs/xxxx.xxx → 右下角 📘 Open-PaperKid 总结 → 侧边栏看结果
 ```
 
 ### 路径 B:命令行(开发者友好)
@@ -53,7 +53,7 @@ ollama serve &
 ollama pull qwen2.5:7b
 ollama pull nomic-embed-text
 
-# 2. 启动 PaperKid
+# 2. 启动 Open-PaperKid
 cd server && npm install && npm run dev
 
 # 3. 扩展设置里
@@ -67,9 +67,12 @@ cd server && npm install && npm run dev
 
 | Provider | 申请地址 | 默认模型 | 备注 |
 |----------|---------|---------|------|
-| OpenAI | <https://platform.openai.com/api-keys> | `gpt-4o-mini` | 性价比最高 |
+| OpenAI | <https://platform.openai.com/api-keys> | `gpt-4o-mini` | 综合质量最好 |
 | Anthropic | <https://console.anthropic.com/> | `claude-3-5-sonnet-latest` | 长上下文友好 |
 | DeepSeek | <https://platform.deepseek.com/> | `deepseek-chat` | 中文场景便宜 |
+| 通义千问 Qwen | <https://dashscope.aliyun.com/> | `qwen-plus-latest` | 阿里中文模型 |
+| Kimi | <https://platform.moonshot.cn/> | `moonshot-v1-8k` | 长上下文 |
+| 智谱 GLM | <https://open.bigmodel.cn/> | `glm-4-flash` | 中文场景性价比高 |
 | Ollama | (本地) | `qwen2.5:7b` | 零费用、零网络 |
 
 ## 配置项(.env,可选)
@@ -78,7 +81,7 @@ cd server && npm install && npm run dev
 
 ```bash
 PORT=5174                  # 监听端口
-STORAGE_DIR=./.paperkid-data   # 论文存储位置
+STORAGE_DIR=./.open-paperkid-data   # 论文存储位置
 MAX_PDF_PAGES=40           # 单篇最大页数(防止误上传超长文档)
 MAX_CHUNK_TOKENS=800       # RAG 切分粒度
 ```
@@ -91,6 +94,9 @@ MAX_CHUNK_TOKENS=800       # RAG 切分粒度
 OPENAI_API_KEY=sk-xxx          # CLI fallback
 ANTHROPIC_API_KEY=sk-ant-xxx
 DEEPSEEK_API_KEY=sk-xxx
+QWEN_API_KEY=sk-xxx
+KIMI_API_KEY=sk-xxx
+GLM_API_KEY=sk-xxx
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 ```
 

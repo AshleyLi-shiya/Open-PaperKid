@@ -10,7 +10,14 @@
 // - The server NEVER persists the key, NEVER logs it, and NEVER writes it
 //   to disk. Each call is stateless.
 
-export type Provider = "openai" | "anthropic" | "deepseek" | "ollama";
+export type Provider =
+  | "openai"
+  | "anthropic"
+  | "deepseek"
+  | "qwen"
+  | "kimi"
+  | "glm"
+  | "ollama";
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -65,6 +72,33 @@ export const PROVIDERS: Record<Provider, ProviderSpec> = {
     defaultBaseUrl: "https://api.deepseek.com/v1",
     suggestedModels: ["deepseek-chat", "deepseek-reasoner"],
   },
+  qwen: {
+    id: "qwen",
+    label: "通义千问 (Qwen)",
+    recommendedModel: "qwen-plus-latest",
+    description: "Alibaba Qwen, strong Chinese paper understanding. Use a DashScope API key.",
+    needsApiKey: true,
+    defaultBaseUrl: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    suggestedModels: ["qwen-plus-latest", "qwen-turbo-latest", "qwen-max-latest"],
+  },
+  kimi: {
+    id: "kimi",
+    label: "Kimi (Moonshot)",
+    recommendedModel: "moonshot-v1-8k",
+    description: "Moonshot Kimi, long-context friendly for Chinese and English papers.",
+    needsApiKey: true,
+    defaultBaseUrl: "https://api.moonshot.cn/v1",
+    suggestedModels: ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"],
+  },
+  glm: {
+    id: "glm",
+    label: "智谱 GLM",
+    recommendedModel: "glm-4-flash",
+    description: "Zhipu GLM, cost-effective Chinese reasoning. Use an Open Platform API key.",
+    needsApiKey: true,
+    defaultBaseUrl: "https://open.bigmodel.cn/api/paas/v4",
+    suggestedModels: ["glm-4-flash", "glm-4", "glm-4-air"],
+  },
   ollama: {
     id: "ollama",
     label: "Ollama (本地模型)",
@@ -76,7 +110,15 @@ export const PROVIDERS: Record<Provider, ProviderSpec> = {
   },
 };
 
-export const PROVIDER_ORDER: Provider[] = ["openai", "anthropic", "deepseek", "ollama"];
+export const PROVIDER_ORDER: Provider[] = [
+  "openai",
+  "anthropic",
+  "deepseek",
+  "qwen",
+  "kimi",
+  "glm",
+  "ollama",
+];
 
 export interface ResolvedProvider {
   provider: Provider;
@@ -118,6 +160,24 @@ export function createClientFor(resolved: ResolvedProvider): LlmClient {
     case "deepseek":
       return new OpenAICompatClient({
         baseUrl: resolved.baseUrl || "https://api.deepseek.com/v1",
+        apiKey: resolved.apiKey || "",
+        model: resolved.model,
+      });
+    case "qwen":
+      return new OpenAICompatClient({
+        baseUrl: resolved.baseUrl || "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        apiKey: resolved.apiKey || "",
+        model: resolved.model,
+      });
+    case "kimi":
+      return new OpenAICompatClient({
+        baseUrl: resolved.baseUrl || "https://api.moonshot.cn/v1",
+        apiKey: resolved.apiKey || "",
+        model: resolved.model,
+      });
+    case "glm":
+      return new OpenAICompatClient({
+        baseUrl: resolved.baseUrl || "https://open.bigmodel.cn/api/paas/v4",
         apiKey: resolved.apiKey || "",
         model: resolved.model,
       });

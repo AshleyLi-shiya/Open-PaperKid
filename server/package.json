@@ -1,7 +1,7 @@
 {
-  "name": "paperkid-server",
+  "name": "open-paperkid-server",
   "version": "0.2.0",
-  "description": "PaperKid backend — bilingual simple-language paper assistant (BYOK, MIT)",
+  "description": "Open-PaperKid backend — bilingual simple-language paper assistant (BYOK, MIT)",
   "type": "module",
   "main": "dist/server/src/index.js",
   "scripts": {

@@ -1,4 +1,4 @@
-# PaperKid 示例
+# Open-PaperKid 示例
 
 ## 论文总结（中英双语）
 

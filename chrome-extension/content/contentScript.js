@@ -11,7 +11,7 @@ function detectPaperId() {
 function makeButton() {
   const btn = document.createElement("button");
   btn.id = "paperkid-btn";
-  btn.textContent = "📘 PaperKid 总结";
+  btn.textContent = "📘 Open-PaperKid 总结";
   btn.style.cssText = `
     position: fixed; right: 20px; bottom: 20px; z-index: 99999;
     padding: 10px 14px; border: 0; border-radius: 8px;
@@ -24,12 +24,12 @@ function makeButton() {
 async function handleClick() {
   const arxivId = detectPaperId();
   if (!arxivId) {
-    alert("PaperKid: 当前页面不是 arxiv 论文。");
+    alert("Open-PaperKid: 当前页面不是 arxiv 论文。");
     return;
   }
   const cfg = await getUserConfig();
   if (cfg.provider !== "ollama" && !cfg.apiKey) {
-    alert("PaperKid: 请先在扩展设置中填入 API Key。");
+    alert("Open-PaperKid: 请先在扩展设置中填入 API Key。");
     return;
   }
   try {
@@ -63,7 +63,7 @@ async function handleClick() {
     const tabId = (await chrome.runtime.sendMessage({ type: "PK_GET_TAB_ID" }).catch(() => null))?.tabId;
     if (tabId) await chrome.sidePanel.open({ tabId });
   } catch (e) {
-    alert(`PaperKid: ${e.message}`);
+    alert(`Open-PaperKid: ${e.message}`);
   }
 }
 

@@ -27,8 +27,8 @@ labels: bug
 
 - OS: [e.g. macOS 14.5 / Ubuntu 22.04 / Windows 11]
 - Browser: [e.g. Chrome 128 / Edge 128 / Firefox 130]
-- PaperKid extension version: [e.g. 0.2.0]
-- PaperKid server version: [e.g. 0.2.0]
+- Open-PaperKid extension version: [e.g. 0.2.0]
+- Open-PaperKid server version: [e.g. 0.2.0]
 - LLM provider: [OpenAI / Anthropic / DeepSeek / Ollama]
 - Model: [e.g. gpt-4o-mini / qwen2.5:7b]
 - Deployment: [local / Docker / Fly.io / Railway / other]

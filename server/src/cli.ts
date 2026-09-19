@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CLI entrypoint for PaperKid. The CLI uses the *environment* variables for
+ * CLI entrypoint for Open-PaperKid. The CLI uses the *environment* variables for
  * provider selection (LLM_BACKEND / OPENAI_API_KEY / ANTHROPIC_API_KEY / etc.),
  * which is the right shape for a local command. The Chrome extension sends
  * provider config per-request via headers instead.
@@ -52,19 +52,28 @@ function resolveCliProvider(args: Record<string, string | boolean>) {
   const apiKey =
     (args["api-key"] as string) ||
     (provider === "openai" && process.env.OPENAI_API_KEY) ||
-    (provider === "deepseek" && process.env.DEEPSEEK_API_KEY) ||
     (provider === "anthropic" && process.env.ANTHROPIC_API_KEY) ||
+    (provider === "deepseek" && process.env.DEEPSEEK_API_KEY) ||
+    (provider === "qwen" && process.env.QWEN_API_KEY) ||
+    (provider === "kimi" && process.env.KIMI_API_KEY) ||
+    (provider === "glm" && process.env.GLM_API_KEY) ||
     undefined;
   const baseUrl =
     (args["base-url"] as string) ||
     (provider === "deepseek" && process.env.DEEPSEEK_BASE_URL) ||
+    (provider === "qwen" && process.env.QWEN_BASE_URL) ||
+    (provider === "kimi" && process.env.KIMI_BASE_URL) ||
+    (provider === "glm" && process.env.GLM_BASE_URL) ||
     (provider === "ollama" && (process.env.OLLAMA_BASE_URL || PROVIDERS.ollama.defaultBaseUrl)) ||
     undefined;
   const model =
     (args.model as string) ||
     (provider === "openai" && process.env.OPENAI_MODEL) ||
-    (provider === "deepseek" && process.env.DEEPSEEK_MODEL) ||
     (provider === "anthropic" && process.env.ANTHROPIC_MODEL) ||
+    (provider === "deepseek" && process.env.DEEPSEEK_MODEL) ||
+    (provider === "qwen" && process.env.QWEN_MODEL) ||
+    (provider === "kimi" && process.env.KIMI_MODEL) ||
+    (provider === "glm" && process.env.GLM_MODEL) ||
     (provider === "ollama" && process.env.OLLAMA_CHAT_MODEL) ||
     PROVIDERS[provider].recommendedModel;
 
@@ -234,20 +243,23 @@ async function main(): Promise<void> {
       break;
     default:
       console.log(`Usage:
-  paperkid summarize --arxiv <id> [--lang zh|en|both] [--provider openai|anthropic|deepseek|ollama] [--api-key sk-xxx] [--model gpt-4o-mini]
-  paperkid summarize --pdf <path>  [--lang zh|en|both] [--provider ...] [--api-key ...] [--model ...]
-  paperkid ask       --arxiv <id> --question "..." [--lang zh|en]
-  paperkid ask       --pdf <path>  --question "..." [--lang zh|en]
-  paperkid translate --arxiv <id>  --target zh|en
-  paperkid translate --pdf  <path> --target zh|en
-  paperkid search    --query "..." [--max 10]
-  paperkid validate  --provider openai [--api-key sk-xxx]
+  open-paperkid summarize --arxiv <id> [--lang zh|en|both] [--provider openai|anthropic|deepseek|qwen|kimi|glm|ollama] [--api-key sk-xxx] [--model gpt-4o-mini]
+  open-paperkid summarize --pdf <path>  [--lang zh|en|both] [--provider ...] [--api-key ...] [--model ...]
+  open-paperkid ask       --arxiv <id> --question "..." [--lang zh|en]
+  open-paperkid ask       --pdf <path>  --question "..." [--lang zh|en]
+  open-paperkid translate --arxiv <id>  --target zh|en
+  open-paperkid translate --pdf  <path> --target zh|en
+  open-paperkid search    --query "..." [--max 10]
+  open-paperkid validate  --provider openai [--api-key sk-xxx]
 
 Environment variables (alternative to CLI flags):
-  LLM_BACKEND=openai|anthropic|deepseek|ollama
+  LLM_BACKEND=openai|anthropic|deepseek|qwen|kimi|glm|ollama
   OPENAI_API_KEY, OPENAI_MODEL
   ANTHROPIC_API_KEY, ANTHROPIC_MODEL
   DEEPSEEK_API_KEY, DEEPSEEK_MODEL, DEEPSEEK_BASE_URL
+  QWEN_API_KEY, QWEN_MODEL, QWEN_BASE_URL
+  KIMI_API_KEY, KIMI_MODEL, KIMI_BASE_URL
+  GLM_API_KEY, GLM_MODEL, GLM_BASE_URL
   OLLAMA_BASE_URL, OLLAMA_CHAT_MODEL, OLLAMA_EMBED_MODEL`);
   }
 }
