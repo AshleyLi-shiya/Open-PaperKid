@@ -1,0 +1,27 @@
+node_modules/
+dist/
+.paperkid-data/
+.env
+*.log
+.DS_Store
+*.tsbuildinfo
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+
+# CI / docker
+*.pid
+
+# Fly.io
+.fly/
+
+# Railway
+.railway/
+
+# Local docs site (if added later)
+_site/
+
+# npm
+package-lock.json.bak

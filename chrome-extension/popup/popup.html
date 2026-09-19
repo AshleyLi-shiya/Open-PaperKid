@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PaperKid</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; width: 360px; padding: 14px; margin: 0; }
+    h1 { font-size: 16px; margin: 0 0 8px 0; display: flex; align-items: center; }
+    h1 .badge { font-size: 10px; background: #e6f1fb; color: #185fa5; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 400; }
+    p  { margin: 6px 0; font-size: 13px; }
+    button { display: block; width: 100%; padding: 8px 12px; margin: 6px 0; border: 1px solid #888; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; box-sizing: border-box; }
+    button:hover { background: #f3f3f3; }
+    button.primary { background: #185fa5; color: white; border-color: #185fa5; }
+    button.primary:hover { background: #0e4880; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { font-size: 12px; color: #555; min-height: 1em; padding: 4px 0; }
+    .ok { color: #0a7d2c; }
+    .err { color: #b00020; }
+    .row { display: flex; gap: 6px; }
+    .row > * { flex: 1; }
+    label { font-size: 12px; color: #444; }
+    input[type=text] { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #aaa; border-radius: 6px; font-size: 13px; }
+    .meta { font-size: 11px; color: #777; margin-top: 8px; }
+    a { color: #185fa5; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>PaperKid<span class="badge">BYOK</span></h1>
+  <p class="status" id="status">检查中…</p>
+
+  <p>当前论文:<strong id="arxivId">—</strong></p>
+  <button id="summarize" class="primary" disabled>总结这篇论文（中英双语）</button>
+  <button id="sidePanel">打开侧边栏 → 继续提问</button>
+  <button id="uploadLocal">导入本地 PDF</button>
+  <input type="file" id="localFile" accept="application/pdf" hidden />
+
+  <p class="meta">
+    Provider: <strong id="provider">—</strong> ·
+    <a href="#" id="openSettings">设置</a> ·
+    <a href="https://github.com/USER/paperkid" target="_blank">关于</a>
+  </p>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

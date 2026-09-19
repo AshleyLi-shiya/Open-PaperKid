@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: paperkid-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  paperkid:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: paperkid-server
+    depends_on:
+      - ollama
+    environment:
+      - PORT=5174
+      - LLM_BACKEND=ollama
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_CHAT_MODEL=qwen2.5:7b
+      - OLLAMA_TRANSLATE_MODEL=qwen2.5:7b
+      - OLLAMA_EMBED_MODEL=nomic-embed-text
+      - STORAGE_DIR=/data
+    ports:
+      - "5174:5174"
+    volumes:
+      - paperkid-data:/data
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+  paperkid-data:
+
+# After `docker-compose up -d`, run the model pull once:
+#   docker exec -it paperkid-ollama ollama pull qwen2.5:7b
+#   docker exec -it paperkid-ollama ollama pull nomic-embed-text

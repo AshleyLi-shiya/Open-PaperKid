@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PaperKid</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; padding: 0; color: #1a1a1a; font-size: 13px; }
+    header { padding: 12px 16px; border-bottom: 1px solid #e5e5e5; background: #fafafa; }
+    header .title { font-weight: 500; font-size: 14px; }
+    header .meta { font-size: 11px; color: #777; margin-top: 2px; }
+    section { padding: 12px 16px; }
+    section h3 { margin: 0 0 8px; font-size: 13px; font-weight: 500; }
+    .card { border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background: white; }
+    .card.zh { border-left: 3px solid #185fa5; }
+    .card.en { border-left: 3px solid #639922; }
+    .card pre { white-space: pre-wrap; font-family: inherit; font-size: 12px; margin: 6px 0; line-height: 1.6; }
+    .muted { color: #888; font-size: 12px; }
+    .row { display: flex; gap: 6px; }
+    .row > * { flex: 1; }
+    button { padding: 6px 10px; border: 1px solid #888; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; }
+    button:hover { background: #f3f3f3; }
+    button.primary { background: #185fa5; color: white; border-color: #185fa5; }
+    button.primary:hover { background: #0e4880; }
+    textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #c0c0c0; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 60px; }
+    .qa-item { border: 1px solid #e5e5e5; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; background: white; }
+    .qa-q { font-weight: 500; margin-bottom: 4px; }
+    .qa-a { white-space: pre-wrap; line-height: 1.6; }
+    .citation { background: #f7f7f7; border-radius: 4px; padding: 4px 6px; margin-top: 4px; font-size: 11px; }
+    a { color: #185fa5; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">PaperKid</div>
+    <div class="meta" id="paperMeta">未加载论文</div>
+    <div class="meta" id="status">从弹窗导入论文后,这里会自动出现。</div>
+  </header>
+
+  <section>
+    <div class="row">
+      <button id="translateZh">翻译成中文</button>
+      <button id="translateEn">Translate to English</button>
+    </div>
+  </section>
+
+  <section id="translateSection" hidden>
+    <h3>翻译结果</h3>
+    <div id="translateContainer" class="muted">尚未翻译</div>
+  </section>
+
+  <section id="summarySection" hidden>
+    <h3>双语总结</h3>
+    <div id="summaryContainer"></div>
+  </section>
+
+  <section id="qaSection">
+    <h3>提问</h3>
+    <textarea id="question" placeholder="比如:这篇论文的核心贡献是什么? 跟哪些 baseline 比了? 实验用了哪些数据集?"></textarea>
+    <div class="row" style="margin-top: 6px;">
+      <button id="askBtn" class="primary">提问</button>
+      <button id="clearLog">清空记录</button>
+    </div>
+    <div id="qaLog" style="margin-top: 10px;"></div>
+  </section>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

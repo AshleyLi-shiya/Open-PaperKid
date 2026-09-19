@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>PaperKid · 设置</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1a1a1a;
+      --muted: #5a5a5a;
+      --border: #e5e5e5;
+      --accent: #185fa5;
+      --accent-bg: #e6f1fb;
+      --danger: #b00020;
+      --ok: #0a7d2c;
+    }
+    body { font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; color: var(--fg); background: var(--bg); }
+    h1 { font-size: 20px; margin: 0 0 4px 0; }
+    h2 { font-size: 15px; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+    p { margin: 6px 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+    label { display: block; font-size: 13px; font-weight: 500; margin: 12px 0 6px; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    input[type=text], input[type=password], select { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #c0c0c0; border-radius: 6px; font-size: 13px; font-family: inherit; }
+    input[type=password] { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+    button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-family: inherit; }
+    button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    button:hover { background: #f7f7f7; }
+    button.primary:hover { background: #0e4880; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 0; }
+    .actions { display: flex; gap: 8px; margin-top: 16px; }
+    .status { font-size: 12px; padding: 6px 10px; border-radius: 6px; margin-top: 8px; }
+    .status.ok { background: #e8f5ec; color: var(--ok); }
+    .status.err { background: #fce8e8; color: var(--danger); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--accent-bg); color: var(--accent); margin-left: 6px; vertical-align: middle; }
+    .key-row { display: flex; gap: 6px; }
+    .key-row input { flex: 1; }
+    .toggle-vis { white-space: nowrap; }
+    .footer { margin-top: 32px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; }
+    a { color: var(--accent); }
+    code { background: #f3f3f3; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>PaperKid 设置<span class="badge">BYOK</span></h1>
+  <p>PaperKid 默认通过你自己的 API Key 调用大模型。Key 只保存在本浏览器本地存储,不发送到任何第三方服务器,也不写日志。</p>
+
+  <h2>1. 服务器地址</h2>
+  <label for="apiBase">后端 API 地址</label>
+  <input type="text" id="apiBase" placeholder="http://localhost:5174" />
+  <div class="hint">本地默认:<code>http://localhost:5174</code>。如果你部署到了云端(参见 <a href="https://github.com/USER/paperkid/blob/main/docs/DEPLOY.md" target="_blank">DEPLOY.md</a>),填完整的 https URL。</div>
+
+  <h2>2. 模型 Provider</h2>
+  <label for="provider">选择 Provider</label>
+  <select id="provider"></select>
+  <div class="hint" id="providerHint"></div>
+
+  <label for="baseUrl" id="baseUrlLabel" style="display:none">Base URL (可选)</label>
+  <input type="text" id="baseUrl" placeholder="https://your-proxy.com/v1" style="display:none" />
+  <div class="hint" id="baseUrlHint" style="display:none">Ollama 或自定义 OpenAI 兼容代理时填写,其余情况留空。</div>
+
+  <label for="model">模型(留空则用推荐)</label>
+  <input type="text" id="model" placeholder="例如 gpt-4o-mini / claude-3-5-sonnet-latest / deepseek-chat / qwen2.5:7b" />
+  <div class="hint" id="modelHint"></div>
+
+  <h2>3. API Key</h2>
+  <label for="apiKey">API Key <span id="apiKeyRequired" style="color: var(--danger); display:none">*必填</span></label>
+  <div class="key-row">
+    <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+    <button type="button" class="toggle-vis" id="toggleVis">显示</button>
+  </div>
+  <div class="hint">本扩展只把 Key 发给你配置的 PaperKid 后端,绝不发送到任何第三方(包括本项目作者)。</div>
+
+  <h2>4. 测试连接</h2>
+  <button id="testBtn" class="primary">发送一次 ping 测试</button>
+  <div id="testStatus"></div>
+
+  <div class="actions">
+    <button id="saveBtn" class="primary">保存</button>
+    <button id="clearBtn">清除 API Key</button>
+  </div>
+
+  <div class="footer">
+    <p>PaperKid · MIT License · <a href="https://github.com/USER/paperkid" target="_blank">GitHub</a> · <a href="https://github.com/USER/paperkid/blob/main/docs/PRIVACY.md" target="_blank">隐私政策</a></p>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

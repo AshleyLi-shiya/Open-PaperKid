@@ -1,0 +1,20 @@
+# Railway configuration
+# Docs: https://docs.railway.app/reference/config-as-code
+
+[build]
+  builder = "DOCKERFILE"
+  dockerfilePath = "server/Dockerfile"
+
+[deploy]
+  startCommand = "node dist/index.js"
+  healthcheckPath = "/api/health"
+  healthcheckTimeout = 30
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyMaxRetries = 3
+
+# Environment variables (set in Railway dashboard for secrets).
+# DO NOT put OPENAI_API_KEY here — PaperKid is BYOK and reads keys per-request.
+[env]
+  PORT = { value = "8080" }
+  STORAGE_DIR = { value = "/data" }
+  NODE_ENV = { value = "production" }
