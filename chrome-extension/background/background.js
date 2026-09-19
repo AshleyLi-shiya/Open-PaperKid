@@ -1,15 +1,37 @@
 // Background service worker. Holds "current paper" state across popup & sidepanel.
 
-let lastPaper = null;
-let lastSummary = null;
+let pendingImport = null;
+let stateWrite = Promise.resolve();
+
+function openPaper(arxivId, tabId) {
+  if (!arxivId || !Number.isInteger(tabId)) return Promise.reject(new Error("无法确定论文或标签页"));
+  pendingImport = arxivId;
+  // Open before awaiting anything to retain Chrome's user gesture.
+  return chrome.sidePanel.open({ tabId }).then(() => {
+    chrome.runtime.sendMessage({ type: "PK_ARXIV_TO_IMPORT" }).catch(() => {});
+  });
+}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === "PK_OPEN_PAPER") {
+    openPaper(msg.arxivId, sender.tab?.id ?? msg.tabId)
+      .then(() => sendResponse({ ok: true }), (e) => sendResponse({ error: e.message }));
+    return true;
+  }
+  if (msg?.type === "PK_TAKE_IMPORT") {
+    sendResponse({ arxivId: pendingImport });
+    pendingImport = null;
+  }
   if (msg?.type === "PK_RESULT") {
-    lastPaper = msg.payload.paper;
-    lastSummary = msg.payload.summary;
+    stateWrite = chrome.storage.session.set({ paperkidResult: {
+      paper: msg.payload.paper, summary: msg.payload.summary,
+    } });
+    stateWrite.then(() => sendResponse({ ok: true }), (e) => sendResponse({ error: e.message }));
+    return true;
   }
   if (msg?.type === "PK_GET_STATE") {
-    sendResponse({ paper: lastPaper, summary: lastSummary });
+    stateWrite.then(() => chrome.storage.session.get("paperkidResult"))
+      .then(({ paperkidResult }) => sendResponse(paperkidResult || {}), () => sendResponse({}));
     return true;
   }
   if (msg?.type === "PK_GET_TAB_ID") {
@@ -33,6 +55,5 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   const m = info.linkUrl?.match(/arxiv\.org\/abs\/([0-9]+\.[0-9]+(?:v[0-9]+)?)/);
   const arxivId = m?.[1];
   if (!arxivId || !tab?.id) return;
-  chrome.sidePanel.open({ tabId: tab.id });
-  chrome.runtime.sendMessage({ type: "PK_ARXIV_TO_IMPORT", arxivId });
+  openPaper(arxivId, tab.id).catch(console.error);
 });

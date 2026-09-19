@@ -26,6 +26,8 @@ Open-PaperKid is an open-source bilingual paper assistant that turns arxiv paper
 
 ## Quick Start
 
+Runtime fixes and repeatable smoke tests are documented in [docs/TESTING.md](docs/TESTING.md).
+
 ```bash
 # 1. Clone the repo
 git clone https://github.com/AshleyLi-shiya/Open-PaperKid.git

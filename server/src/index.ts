@@ -154,7 +154,7 @@ async function main() {
     <span class="badge">BYOK</span>
     <span class="badge">Open Source · MIT</span>
   </p>
-  <p>This is the Open-PaperKid backend. Most users should install the <a href="https://github.com/AshleyLi-shiya/paperkid">Chrome extension</a> and configure their API key in the extension settings.</p>
+  <p>This is the Open-PaperKid backend. Most users should install the <a href="https://github.com/AshleyLi-shiya/Open-PaperKid">Chrome extension</a> and configure their API key in the extension settings.</p>
   <h2>Quick reference</h2>
   <ul>
     <li><code>GET  /api/health</code></li>

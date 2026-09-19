@@ -19,7 +19,7 @@ const SECTION_PATTERNS: { name: string; regex: RegExp }[] = [
 
 function splitSections(plainText: string): { sections: PaperSection[]; abstract: string } {
   // pdf-parse gives one paragraph per logical line break. Split into paragraphs.
-  const lines = plainText.split(/\n\s*\n/);
+  const lines = plainText.split(/\r?\n/);
   const sections: PaperSection[] = [];
   let current: PaperSection = { title: "Body", text: "" };
   let abstract = "";
@@ -38,8 +38,7 @@ function splitSections(plainText: string): { sections: PaperSection[]; abstract:
   if (current.text.trim().length > 0) sections.push(current);
 
   // Always re-derive abstract: usually it's the first ~200-300 words.
-  const first = plainText.split(/\n\s*\n/)[0] ?? "";
-  abstract = first.trim().slice(0, 2500);
+  abstract = (sections.find((s) => s.title === "Abstract")?.text || plainText.trim()).slice(0, 2500);
 
   return { sections, abstract };
 }
@@ -50,7 +49,11 @@ export async function parsePdf(buffer: Buffer, maxPages = config.maxPdfPages): P
   abstract: string;
   numPages: number;
 }> {
-  const result = await pdfParse(buffer, { max: maxPages });
+  // PDF.js expects Uint8Array.slice() to copy; Buffer.slice() returns a view
+  // and can corrupt parsing of otherwise valid PDFs. The legacy typings only
+  // declare Buffer, although the underlying parser supports Uint8Array.
+  const parseBytes = pdfParse as (data: Uint8Array, options: pdfParse.Options) => Promise<pdfParse.Result>;
+  const result = await parseBytes(new Uint8Array(buffer), { max: maxPages });
   const text = result.text || "";
   const { sections, abstract } = splitSections(text);
   return { text, sections, abstract, numPages: result.numpages };

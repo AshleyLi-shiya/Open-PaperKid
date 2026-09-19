@@ -52,7 +52,7 @@ export async function summarize(paperId: string, req: SummaryRequest, ctx: Provi
   const args = {
     title: paper.metadata.title,
     abstract: paper.metadata.abstract,
-    intro: findSection(paper, "Introduction"),
+    intro: findSection(paper, "Introduction") || truncateByTokens(paper.fullText, 1500),
     method: findSection(paper, "Method"),
     experiments: findSection(paper, "Experiments"),
     conclusion: findSection(paper, "Conclusion"),

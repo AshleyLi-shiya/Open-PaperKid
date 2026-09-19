@@ -5,6 +5,9 @@ const DEFAULT_API_BASE = "http://localhost:5174";
 
 // In-memory cache of the active user config. Source of truth is chrome.storage.
 let _configCache = null;
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.paperkidConfig) _configCache = null;
+});
 
 export async function getApiBase() {
   const c = await getUserConfig();

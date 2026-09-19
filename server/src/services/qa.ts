@@ -15,13 +15,11 @@ export async function ask(paperId: string, req: AskRequest, ctx: ProviderContext
   let indexOk = false;
   try {
     indexOk = await ensureIndexed(paperId, ctx.client);
+    if (indexOk) {
+      retrieved = await searchIndex(paperId, req.question, ctx.client, req.topK ?? 6);
+    }
   } catch (e) {
     indexOk = false;
-  }
-
-  if (indexOk) {
-    const topK = req.topK ?? 6;
-    retrieved = await searchIndex(paperId, req.question, ctx.client, topK);
   }
 
   const context =

@@ -1,4 +1,4 @@
-import { ask, translatePaper, getApiBase } from "../lib/apiClient.js";
+import { ask, translatePaper, ingestArxiv, summarize, getUserConfig } from "../lib/apiClient.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -79,17 +79,45 @@ $("askBtn").addEventListener("click", () => {
 });
 $("clearLog").addEventListener("click", () => ($("qaLog").innerHTML = ""));
 
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg?.type !== "PK_RESULT") return;
-  const p = msg.payload;
+function showResult(p) {
   currentPaper = { id: p.paperId, title: p.paper.title };
   $("paperMeta").textContent = `${p.paper.title} · ${p.paper.id}`;
   if (p.kind === "summary") renderSummary(p.paperId, p.summary);
+}
+
+let importing = false;
+async function importPending() {
+  if (importing) return;
+  importing = true;
+  try {
+    const { arxivId } = await chrome.runtime.sendMessage({ type: "PK_TAKE_IMPORT" });
+    if (!arxivId) return;
+    $("paperMeta").textContent = `导入并总结 ${arxivId}…`;
+    const cfg = await getUserConfig();
+    if (cfg.provider !== "ollama" && !cfg.apiKey) throw new Error("请先在扩展设置中填入 API Key。");
+    const { paper } = await ingestArxiv(arxivId);
+    const summary = await summarize(paper.id, "both");
+    const payload = { kind: "summary", paperId: paper.id, paper, summary };
+    showResult(payload);
+    await chrome.runtime.sendMessage({ type: "PK_RESULT", payload });
+  } catch (e) {
+    $("paperMeta").textContent = `失败：${e.message}`;
+  } finally {
+    importing = false;
+  }
+}
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg?.type === "PK_RESULT") showResult(msg.payload);
+  if (msg?.type === "PK_ARXIV_TO_IMPORT") importPending();
 });
 
 (async () => {
   try {
-    await getApiBase();
-  } catch (_) {}
-  // initial empty state
+    const state = await chrome.runtime.sendMessage({ type: "PK_GET_STATE" });
+    if (state?.paper) showResult({ kind: "summary", paperId: state.paper.id, ...state });
+    await importPending();
+  } catch (e) {
+    $("paperMeta").textContent = `失败：${e.message}`;
+  }
 })();

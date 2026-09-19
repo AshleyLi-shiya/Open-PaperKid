@@ -1,8 +1,7 @@
 import {
   arxivIdFromUrl,
+  hfPapersIdFromUrl,
   health,
-  ingestArxiv,
-  summarize,
   getUserConfig,
   getApiBase,
 } from "../lib/apiClient.js";
@@ -10,6 +9,7 @@ import {
 const statusEl = document.getElementById("status");
 const arxivEl = document.getElementById("arxivId");
 const providerEl = document.getElementById("provider");
+let activeTab = null;
 
 function setStatus(msg, kind) {
   statusEl.textContent = msg;
@@ -24,7 +24,8 @@ async function refresh() {
     setStatus(`无法连接：${e.message}`, "err");
   }
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const id = tab?.url ? arxivIdFromUrl(tab.url) : null;
+  activeTab = tab;
+  const id = tab?.url ? arxivIdFromUrl(tab.url) || hfPapersIdFromUrl(tab.url) : null;
   arxivEl.textContent = id || "—";
   document.getElementById("summarize").disabled = !id;
 
@@ -42,8 +43,7 @@ document.getElementById("openSettings").addEventListener("click", (e) => {
 });
 
 document.getElementById("sidePanel").addEventListener("click", async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab?.id) await chrome.sidePanel.open({ tabId: tab.id });
+  if (activeTab?.id) await chrome.sidePanel.open({ tabId: activeTab.id });
 });
 
 document.getElementById("uploadLocal").addEventListener("click", () => {
@@ -55,6 +55,7 @@ document.getElementById("localFile").addEventListener("change", async (e) => {
   if (!file) return;
   setStatus(`上传 ${file.name}…`);
   try {
+    if (activeTab?.id) await chrome.sidePanel.open({ tabId: activeTab.id });
     const buf = new Uint8Array(await file.arrayBuffer());
     let binary = "";
     for (let i = 0; i < buf.length; i++) binary += String.fromCharCode(buf[i]);
@@ -79,8 +80,6 @@ document.getElementById("localFile").addEventListener("change", async (e) => {
     }
     const json = await r.json();
     setStatus(`已导入：${json.paper.title}`, "ok");
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab?.id) await chrome.sidePanel.open({ tabId: tab.id });
     await chrome.runtime.sendMessage({
       type: "PK_RESULT",
       payload: { kind: "summary", paperId: json.paper.id, paper: json.paper, summary: null },
@@ -91,19 +90,14 @@ document.getElementById("localFile").addEventListener("change", async (e) => {
 });
 
 document.getElementById("summarize").addEventListener("click", async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const id = tab?.url ? arxivIdFromUrl(tab.url) : null;
+  const tab = activeTab;
+  const id = tab?.url ? arxivIdFromUrl(tab.url) || hfPapersIdFromUrl(tab.url) : null;
   if (!id) return;
   setStatus("导入并总结中…");
   try {
-    const ingest = await ingestArxiv(id);
-    const result = await summarize(ingest.paper.id, "both");
-    await chrome.sidePanel.open({ tabId: tab.id });
-    await chrome.runtime.sendMessage({
-      type: "PK_RESULT",
-      payload: { kind: "summary", paperId: ingest.paper.id, paper: ingest.paper, summary: result },
-    });
-    setStatus("完成！已在侧边栏显示。", "ok");
+    const result = await chrome.runtime.sendMessage({ type: "PK_OPEN_PAPER", arxivId: id, tabId: tab.id });
+    if (result?.error) throw new Error(result.error);
+    setStatus("已在侧边栏开始处理。", "ok");
   } catch (e) {
     setStatus(`失败：${e.message}`, "err");
   }
