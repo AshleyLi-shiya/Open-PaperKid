@@ -6,14 +6,14 @@
   dockerfilePath = "server/Dockerfile"
 
 [deploy]
-  startCommand = "node dist/index.js"
+  startCommand = "node dist/server/src/index.js"
   healthcheckPath = "/api/health"
   healthcheckTimeout = 30
   restartPolicyType = "ON_FAILURE"
   restartPolicyMaxRetries = 3
 
 # Environment variables (set in Railway dashboard for secrets).
-# DO NOT put OPENAI_API_KEY here — PaperKid is BYOK and reads keys per-request.
+# DO NOT put OPENAI_API_KEY here — Open-PaperKid is BYOK and reads keys per-request.
 [env]
   PORT = { value = "8080" }
   STORAGE_DIR = { value = "/data" }

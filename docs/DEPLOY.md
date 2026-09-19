@@ -1,13 +1,13 @@
 # 部署指南
 
-PaperKid 后端可以部署到几乎任何支持 Node 20+ 的平台。**前端的 Chrome 扩展始终由用户本地安装**(不需要你部署)。
+Open-PaperKid 后端可以部署到几乎任何支持 Node 20+ 的平台。**前端的 Chrome 扩展始终由用户本地安装**(不需要你部署)。
 
 ## 选择平台
 
 | 场景 | 推荐 | 一键链接 |
 |------|------|----------|
 | 只想自己用 | 本机 `npm run dev` | - |
-| 部署给小圈子(< 100 人) | **Fly.io**(免费额度够用) | [![Deploy on Fly.io](https://img.shields.io/badge/Deploy-Fly.io-blueviolet)](https://fly.io/launch/?docker-image=ghcr.io/AshleyLi-shiya/paperkid) |
+| 部署给小圈子(< 100 人) | **Fly.io**(免费额度够用) | [![Deploy on Fly.io](https://img.shields.io/badge/Deploy-Fly.io-blueviolet)](https://fly.io/launch/?docker-image=ghcr.io/AshleyLi-shiya/open-paperkid) |
 | 公开上线(预期多人) | **Railway**(按用量付费) | [![Deploy on Railway](https://img.shields.io/badge/Deploy-Railway-railway)](https://railway.app/template/...) |
 | 企业内 / 完全可控 | **自己的服务器 + Docker Compose** | 见下文 |
 | 高并发 | Kubernetes | 见下文 |
@@ -19,8 +19,8 @@ PaperKid 后端可以部署到几乎任何支持 Node 20+ 的平台。**前端�
 ```bash
 docker compose up -d
 # 等几分钟让 Ollama 拉模型
-docker exec -it paperkid-ollama ollama pull qwen2.5:7b
-docker exec -it paperkid-ollama ollama pull nomic-embed-text
+docker exec -it open-paperkid-ollama ollama pull qwen2.5:7b
+docker exec -it open-paperkid-ollama ollama pull nomic-embed-text
 ```
 
 后端跑在 `http://localhost:5174`。
@@ -29,11 +29,11 @@ docker exec -it paperkid-ollama ollama pull nomic-embed-text
 
 ## 2. Fly.io(推荐用于小圈子分享)
 
-Fly.io 提供免费额度,**适合 1-50 人的小团队**。PaperKid BYOK 模式下,服务端不需要 GPU。
+Fly.io 提供免费额度,**适合 1-50 人的小团队**。Open-PaperKid BYOK 模式下,服务端不需要 GPU。
 
 ```bash
 # 安装 flyctl: https://fly.io/docs/hands-on/install-flyctl/
-fly launch --copy-config --name paperkid-YOURNAME
+fly launch --copy-config --name open-paperkid-YOURNAME
 fly deploy
 ```
 
@@ -49,11 +49,11 @@ STORAGE_DIR=/data               # 持久卷
 ```toml
 # fly.toml
 [mounts]
-  source = "paperkid_data"
+  source = "open_paperkid_data"
   destination = "/data"
 ```
 
-**注意**:不要在 Fly 上设置 `OPENAI_API_KEY` 等环境变量——PaperKid 是 BYOK,Key 由用户在扩展里填。如果你错误地把 Key 放进环境变量,服务端会忽略它(每次请求从 header 读),所以无大碍。
+**注意**:不要在 Fly 上设置 `OPENAI_API_KEY` 等环境变量——Open-PaperKid 是 BYOK,Key 由用户在扩展里填。如果你错误地把 Key 放进环境变量,服务端会忽略它(每次请求从 header 读),所以无大碍。
 
 ---
 
@@ -61,7 +61,7 @@ STORAGE_DIR=/data               # 持久卷
 
 ```bash
 # 一键从 GitHub 部署
-# railway.app/new → Deploy from GitHub → 选 paperkid 仓库
+# railway.app/new → Deploy from GitHub → 选 Open-PaperKid 仓库
 ```
 
 Railway 会自动检测 Dockerfile 并部署。挂载 volume:
@@ -76,17 +76,17 @@ STORAGE_DIR=/data
 ## 4. 自有服务器 / Docker
 
 ```bash
-git clone https://github.com/AshleyLi-shiya/paperkid.git
-cd paperkid/server
-docker build -t paperkid-server .
+git clone https://github.com/AshleyLi-shiya/Open-PaperKid.git
+cd Open-PaperKid
+docker build -t open-paperkid-server -f server/Dockerfile .
 docker run -d \
-  --name paperkid \
+  --name open-paperkid \
   -p 5174:5174 \
-  -v paperkid-data:/data \
+  -v open-paperkid-data:/data \
   -e PORT=5174 \
   -e STORAGE_DIR=/data \
   --restart unless-stopped \
-  paperkid-server
+  open-paperkid-server
 ```
 
 反向代理建议(nginx 示例):
@@ -94,10 +94,10 @@ docker run -d \
 ```nginx
 server {
   listen 443 ssl http2;
-  server_name paperkid.example.com;
+  server_name open-paperkid.example.com;
 
-  ssl_certificate /etc/letsencrypt/live/paperkid.example.com/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/paperkid.example.com/privkey.pem;
+  ssl_certificate /etc/letsencrypt/live/open-paperkid.example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/open-paperkid.example.com/privkey.pem;
 
   client_max_body_size 25m;  # PDF base64 上传需要
 
@@ -116,26 +116,26 @@ server {
 
 ## 5. Kubernetes
 
-最小化部署(`paperkid-deployment.yaml`):
+最小化部署(`open-paperkid-deployment.yaml`):
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: paperkid
+  name: open-paperkid
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: paperkid
+      app: open-paperkid
   template:
     metadata:
       labels:
-        app: paperkid
+        app: open-paperkid
     spec:
       containers:
-        - name: paperkid
-          image: ghcr.io/AshleyLi-shiya/paperkid:latest
+        - name: open-paperkid
+          image: ghcr.io/AshleyLi-shiya/open-paperkid:latest
           ports:
             - containerPort: 5174
           env:
@@ -145,7 +145,7 @@ spec:
               value: "/data"
           volumeMounts:
             - mountPath: /data
-              name: paperkid-data
+              name: open-paperkid-data
           readinessProbe:
             httpGet:
               path: /api/health
@@ -153,17 +153,17 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
       volumes:
-        - name: paperkid-data
+        - name: open-paperkid-data
           persistentVolumeClaim:
-            claimName: paperkid-data
+            claimName: open-paperkid-data
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: paperkid
+  name: open-paperkid
 spec:
   selector:
-    app: paperkid
+    app: open-paperkid
   ports:
     - port: 80
       targetPort: 5174
@@ -173,7 +173,7 @@ spec:
 
 ## 反向代理 + Cloudflare(可选)
 
-把 PaperKid 部署在 `paperkid.example.com`,Cloudflare 在前面提供:
+把 Open-PaperKid 部署在 `open-paperkid.example.com`,Cloudflare 在前面提供:
 - HTTPS
 - DDoS 防护
 - 缓存静态资源(本项目几乎全 API,缓存意义不大)

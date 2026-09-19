@@ -3,7 +3,7 @@ version: "3.8"
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: paperkid-ollama
+    container_name: open-paperkid-ollama
     ports:
       - "11434:11434"
     volumes:
@@ -17,11 +17,11 @@ services:
               count: all
               capabilities: [gpu]
 
-  paperkid:
+  open-paperkid:
     build:
-      context: ./server
-      dockerfile: Dockerfile
-    container_name: paperkid-server
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: open-paperkid-server
     depends_on:
       - ollama
     environment:
@@ -35,13 +35,13 @@ services:
     ports:
       - "5174:5174"
     volumes:
-      - paperkid-data:/data
+      - open-paperkid-data:/data
     restart: unless-stopped
 
 volumes:
   ollama-data:
-  paperkid-data:
+  open-paperkid-data:
 
 # After `docker-compose up -d`, run the model pull once:
-#   docker exec -it paperkid-ollama ollama pull qwen2.5:7b
-#   docker exec -it paperkid-ollama ollama pull nomic-embed-text
+#   docker exec -it open-paperkid-ollama ollama pull qwen2.5:7b
+#   docker exec -it open-paperkid-ollama ollama pull nomic-embed-text
