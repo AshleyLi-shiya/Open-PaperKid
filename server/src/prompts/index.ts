@@ -14,8 +14,8 @@ export const SIMPLE_LANGUAGE_RULES = `
 `;
 
 /**
- * Summary prompt. We use a 4-canonical-question structure (same idea as
- * ChatPaper's固定四个问题) but with simple-language rules applied.
+ * Summary prompt. Built on a 4-canonical-question structure
+ * (background / prior work / method / results) with simple-language rules applied.
  *
  * Returns JSON for reliable parsing.
  */
