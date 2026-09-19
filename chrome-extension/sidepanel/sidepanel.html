@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Open-PaperKid</title>
@@ -32,33 +32,27 @@
 <body>
   <header>
     <div class="title">Open-PaperKid</div>
-    <div class="meta" id="paperMeta">未加载论文</div>
-    <div class="meta" id="status">从弹窗导入论文后,这里会自动出现。</div>
+    <div class="meta" id="paperMeta">No paper loaded</div>
+    <div class="meta" id="status">Import a paper, then choose a summary language.</div>
   </header>
 
   <section>
     <div class="row">
-      <button id="translateZh">翻译成中文</button>
-      <button id="translateEn">Translate to English</button>
+      <button id="summaryEn">summarize in English</button>
+      <button id="summaryZh">中文总结</button>
     </div>
   </section>
 
-  <section id="translateSection" hidden>
-    <h3>翻译结果</h3>
-    <div id="translateContainer" class="muted">尚未翻译</div>
-  </section>
-
   <section id="summarySection" hidden>
-    <h3>双语总结</h3>
     <div id="summaryContainer"></div>
   </section>
 
   <section id="qaSection">
-    <h3>提问</h3>
-    <textarea id="question" placeholder="比如:这篇论文的核心贡献是什么? 跟哪些 baseline 比了? 实验用了哪些数据集?"></textarea>
+    <h3>Ask about this paper</h3>
+    <textarea id="question" placeholder="For example: How does the new idea work?"></textarea>
     <div class="row" style="margin-top: 6px;">
-      <button id="askBtn" class="primary">提问</button>
-      <button id="clearLog">清空记录</button>
+      <button id="askBtn" class="primary">Ask</button>
+      <button id="clearLog">Clear history</button>
     </div>
     <div id="qaLog" style="margin-top: 10px;"></div>
   </section>

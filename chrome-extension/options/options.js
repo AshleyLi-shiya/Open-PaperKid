@@ -1,117 +1,128 @@
-import {
-  getUserConfig,
-  setUserConfig,
-  clearApiKey,
-  listProviders,
-  validateProvider,
-  setApiBase,
-} from "../lib/apiClient.js";
+import { getUserConfig, setUserConfig, clearApiKey, listProviders, validateProvider } from "../lib/apiClient.js";
+import { messages, normalizeLanguage } from "./i18n.js";
 
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
+let language = "en";
+let providers = [];
+let status = null;
+let languageWrite = Promise.resolve();
+const t = () => messages[language];
 
-let _providers = [];
+function renderStatus() {
+  const el = $("testStatus");
+  el.className = status ? `status ${status.kind}` : "";
+  el.textContent = status ? `${t()[status.key]}${status.detail ? " · " + status.detail : ""}` : "";
+}
+
+function showStatus(key, kind = "", detail = "") {
+  status = { key, kind, detail };
+  renderStatus();
+}
+
+function errorDetail(e) {
+  // The shared client also serves the Chinese popup; translate its connectivity
+  // wrapper here while preserving actual provider error details.
+  return /无法连接|Failed to fetch/.test(e?.message || "") ? t().offline : (e?.message || "");
+}
 
 function renderProviderHints() {
   const p = $("provider").value;
-  const spec = _providers.find((x) => x.id === p);
+  const spec = providers.find(x => x.id === p);
   if (!spec) return;
-  $("providerHint").textContent = spec.description || "";
-  $("modelHint").textContent = `推荐模型:${spec.recommendedModel}。可用模型:${(spec.suggestedModels || []).join(", ") || "(留空使用推荐)"}`;
-  if (spec.needsApiKey) {
-    $("apiKeyRequired").style.display = "inline";
-  } else {
-    $("apiKeyRequired").style.display = "none";
+  $("providerHint").textContent = t().descriptions[p] || spec.description || "";
+  $("modelHint").textContent = `${t().recommended}: ${spec.recommendedModel}. ${t().available}: ${(spec.suggestedModels || []).join(", ") || t().useRecommended}`;
+  $("apiKeyRequired").style.display = spec.needsApiKey ? "inline" : "none";
+  // All OpenAI-compatible providers support a custom endpoint.
+  const showBase = p !== "anthropic";
+  for (const id of ["baseUrlLabel", "baseUrl", "baseUrlHint"]) $(id).style.display = showBase ? "block" : "none";
+}
+
+function renderLanguage() {
+  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+  document.title = t().title;
+  $("uiLanguage").value = language;
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t()[el.dataset.i18n];
+  $("model").placeholder = t().modelPlaceholder;
+  $("toggleVis").textContent = $("apiKey").type === "password" ? t().show : t().hide;
+  for (const opt of $("provider").options) {
+    const spec = providers.find(p => p.id === opt.value);
+    opt.textContent = `${t().labels[opt.value] || spec.label}${spec.needsApiKey ? "" : " · " + t().noKey}`;
   }
-  // Show baseUrl only for ollama
-  const showBase = p === "ollama";
-  $("baseUrlLabel").style.display = showBase ? "block" : "none";
-  $("baseUrl").style.display = showBase ? "block" : "none";
-  $("baseUrlHint").style.display = showBase ? "block" : "none";
-  if (showBase && spec.defaultBaseUrl && !$("baseUrl").value) {
-    $("baseUrl").value = spec.defaultBaseUrl;
-  }
+  renderProviderHints();
+  renderStatus();
 }
 
 async function loadForm() {
-  _providers = await listProviders();
   const c = await getUserConfig();
-
-  $("apiBase").value = c.apiBase || "";
+  language = normalizeLanguage(c.uiLanguage);
+  renderLanguage();
+  providers = await listProviders();
   const sel = $("provider");
   sel.innerHTML = "";
-  for (const p of _providers) {
+  for (const p of providers) {
     const opt = document.createElement("option");
     opt.value = p.id;
-    opt.textContent = `${p.label}${p.needsApiKey ? "" : " · 免 Key"}`;
     sel.appendChild(opt);
   }
   sel.value = c.provider || "openai";
+  $("apiBase").value = c.apiBase || "http://localhost:5174";
   $("apiKey").value = c.apiKey || "";
   $("baseUrl").value = c.baseUrl || "";
   $("model").value = c.model || "";
-  renderProviderHints();
+  renderLanguage();
 }
 
-$("provider").addEventListener("change", renderProviderHints);
-
-$("toggleVis").addEventListener("click", () => {
-  const inp = $("apiKey");
-  if (inp.type === "password") {
-    inp.type = "text";
-    $("toggleVis").textContent = "隐藏";
-  } else {
-    inp.type = "password";
-    $("toggleVis").textContent = "显示";
-  }
+$("uiLanguage").addEventListener("change", () => {
+  language = normalizeLanguage($("uiLanguage").value);
+  renderLanguage();
+  const selected = language;
+  // Persist only the language: switching must not save unfinished form edits.
+  languageWrite = languageWrite.catch(() => {}).then(() => setUserConfig({ uiLanguage: selected }));
+  languageWrite.catch(e => showStatus("saveFailed", "err", errorDetail(e)));
 });
 
-$("saveBtn").addEventListener("click", async () => {
-  await setApiBase($("apiBase").value.trim() || "http://localhost:5174");
+$("provider").addEventListener("change", renderProviderHints);
+$("toggleVis").addEventListener("click", () => {
+  $("apiKey").type = $("apiKey").type === "password" ? "text" : "password";
+  $("toggleVis").textContent = $("apiKey").type === "password" ? t().show : t().hide;
+});
+
+async function saveForm() {
+  await languageWrite;
   await setUserConfig({
+    apiBase: $("apiBase").value.trim() || "http://localhost:5174",
     provider: $("provider").value,
     apiKey: $("apiKey").value.trim(),
     baseUrl: $("baseUrl").value.trim(),
     model: $("model").value.trim(),
+    uiLanguage: language,
   });
-  const s = $("testStatus");
-  s.className = "status ok";
-  s.textContent = "已保存。点击 \"发送一次 ping 测试\" 验证连通性。";
+}
+
+$("saveBtn").addEventListener("click", async () => {
+  try { await saveForm(); showStatus("saved", "ok"); }
+  catch (e) { showStatus("saveFailed", "err", errorDetail(e)); }
 });
 
 $("clearBtn").addEventListener("click", async () => {
-  await clearApiKey();
-  $("apiKey").value = "";
-  const s = $("testStatus");
-  s.className = "status ok";
-  s.textContent = "API Key 已清除。";
+  try {
+    await languageWrite;
+    await clearApiKey();
+    $("apiKey").value = "";
+    showStatus("cleared", "ok");
+  } catch (e) { showStatus("saveFailed", "err", errorDetail(e)); }
 });
 
 $("testBtn").addEventListener("click", async () => {
-  // Save first so the latest config is what gets tested.
-  await setApiBase($("apiBase").value.trim() || "http://localhost:5174");
-  await setUserConfig({
-    provider: $("provider").value,
-    apiKey: $("apiKey").value.trim(),
-    baseUrl: $("baseUrl").value.trim(),
-    model: $("model").value.trim(),
-  });
-
-  const s = $("testStatus");
-  s.className = "status";
-  s.textContent = "正在发送测试请求…";
+  $("testBtn").disabled = true;
   try {
+    await saveForm();
+    showStatus("testing");
     const r = await validateProvider();
-    if (r.ok) {
-      s.className = "status ok";
-      s.textContent = `✓ 连接成功 · ${r.provider} · ${r.model} · ${r.latencyMs}ms`;
-    } else {
-      s.className = "status err";
-      s.textContent = `✗ 连接失败:${r.error}`;
-    }
-  } catch (e) {
-    s.className = "status err";
-    s.textContent = `✗ ${e.message}`;
-  }
+    showStatus(r.ok ? "success" : "failure", r.ok ? "ok" : "err",
+      r.ok ? `${r.provider} · ${r.model} · ${r.latencyMs}ms` : errorDetail({ message: r.error }));
+  } catch (e) { showStatus("failure", "err", errorDetail(e)); }
+  finally { $("testBtn").disabled = false; }
 });
 
-loadForm();
+loadForm().catch(e => showStatus("loadFailed", "err", errorDetail(e)));

@@ -65,7 +65,7 @@ export async function summarize(paperId: string, req: SummaryRequest, ctx: Provi
         { role: "system", content: system },
         { role: "user", content: user },
       ],
-      { json: true, temperature: 0.2, model: ctx.resolved.model }
+      { json: true, temperature: 0.2, maxTokens: 2000, model: ctx.resolved.model }
     );
     summaries[lang] = coerceSummary(safeParseJson(raw));
   }

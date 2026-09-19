@@ -51,6 +51,14 @@ test('compiled server: PDF upload, summary, translation, retrieval and fallback'
   const url = '/api/papers/' + encodeURIComponent(paper.id);
   const summary = await call(url + '/summarize', { language: 'both' });
   assert.ok(summary.summaries.zh.oneLine && summary.summaries.en.oneLine);
+  for (const language of ['en', 'zh']) {
+    const before = calls.filter(c => c.body.format === 'json').length;
+    const single = await call(url + '/summarize', { language });
+    assert.deepEqual(Object.keys(single.summaries), [language]);
+    assert.equal(single.language, language);
+    assert.equal(calls.filter(c => c.body.format === 'json').length, before + 1);
+    assert.match(calls.at(-1).body.messages[0].content, /8–10/);
+  }
   assert.ok(calls.filter(c => c.body.format === 'json').every(c => c.body.messages[1].content.includes('Plants use light')));
   assert.ok((await call(url + '/translate', { targetLanguage: 'zh' })).sections.length);
   assert.ok((await call(url + '/ask', { question: 'What helps plants?' })).citations.length);

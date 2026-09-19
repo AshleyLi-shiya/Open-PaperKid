@@ -20,6 +20,13 @@ Extension tests execute manifest content scripts as classic JavaScript, check
 click-to-side-panel delegation, queued import consumption, restoration after
 service-worker restart, and cache invalidation after settings changes.
 
+Language regression tests cover English settings defaults, persisted Chinese
+selection without changing credentials, English-first summary buttons, import
+without automatic generation, one-language rendering of legacy bilingual results,
+and ignoring stale responses after switching languages. API tests verify exactly
+one model call per single-language summary. Prompts target ages 8–10; mocked tests
+do not establish actual model readability.
+
 ## Fixes covered
 
 - Content scripts cannot use static ES-module imports. Paper-page clicks now

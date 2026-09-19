@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Open-PaperKid · 设置</title>
+  <title>Open-PaperKid · Settings</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -42,46 +42,48 @@
   </style>
 </head>
 <body>
-  <h1>Open-PaperKid 设置<span class="badge">BYOK</span></h1>
-  <p>Open-PaperKid 默认通过你自己的 API Key 调用大模型。Key 只保存在本浏览器本地存储,不发送到任何第三方服务器,也不写日志。</p>
+  <label for="uiLanguage" data-i18n="language">Language</label>
+  <select id="uiLanguage"><option value="en">English</option><option value="zh">简体中文</option></select>
+  <h1><span data-i18n="heading">Open-PaperKid Settings</span><span class="badge">BYOK</span></h1>
+  <p data-i18n="intro">Use your own API key to access language models. Your key is stored locally in this browser and sent through your configured backend to your chosen model provider.</p>
 
-  <h2>1. 服务器地址</h2>
-  <label for="apiBase">后端 API 地址</label>
+  <h2 data-i18n="server">1. Server</h2>
+  <label for="apiBase" data-i18n="apiBase">Backend API URL</label>
   <input type="text" id="apiBase" placeholder="http://localhost:5174" />
-  <div class="hint">本地默认:<code>http://localhost:5174</code>。如果你部署到了云端(参见 <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/DEPLOY.md" target="_blank">DEPLOY.md</a>),填完整的 https URL。</div>
+  <div class="hint"><span data-i18n="serverHint">Default: http://localhost:5174. For a hosted Open-PaperKid backend, enter its full HTTPS URL. Deployment guide:</span> <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/DEPLOY.md" target="_blank">DEPLOY.md</a></div>
 
-  <h2>2. 模型 Provider</h2>
-  <label for="provider">选择 Provider</label>
+  <h2 data-i18n="providerSection">2. Model provider</h2>
+  <label for="provider" data-i18n="provider">Choose a provider</label>
   <select id="provider"></select>
   <div class="hint" id="providerHint"></div>
 
-  <label for="baseUrl" id="baseUrlLabel" style="display:none">Base URL (可选)</label>
+  <label for="baseUrl" id="baseUrlLabel" data-i18n="baseUrl" style="display:none">Provider Base URL (optional)</label>
   <input type="text" id="baseUrl" placeholder="https://your-proxy.com/v1" style="display:none" />
-  <div class="hint" id="baseUrlHint" style="display:none">Ollama 或自定义 OpenAI 兼容代理时填写,其余情况留空。</div>
+  <div class="hint" id="baseUrlHint" data-i18n="baseHint" style="display:none">For Ollama or a custom OpenAI-compatible endpoint, including Token Plan. This is separate from the backend API URL.</div>
 
-  <label for="model">模型(留空则用推荐)</label>
-  <input type="text" id="model" placeholder="例如 gpt-4o-mini / claude-3-5-sonnet-latest / deepseek-chat / qwen2.5:7b" />
+  <label for="model" data-i18n="model">Model (leave blank for recommended)</label>
+  <input type="text" id="model" placeholder="e.g. gpt-4o-mini / qwen3.8-max / deepseek-chat" />
   <div class="hint" id="modelHint"></div>
 
-  <h2>3. API Key</h2>
-  <label for="apiKey">API Key <span id="apiKeyRequired" style="color: var(--danger); display:none">*必填</span></label>
+  <h2 data-i18n="keySection">3. API key</h2>
+  <label for="apiKey">API Key <span id="apiKeyRequired" data-i18n="required" style="color: var(--danger); display:none">*Required</span></label>
   <div class="key-row">
     <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
-    <button type="button" class="toggle-vis" id="toggleVis">显示</button>
+    <button type="button" class="toggle-vis" id="toggleVis">Show</button>
   </div>
-  <div class="hint">本扩展只把 Key 发给你配置的 Open-PaperKid 后端,绝不发送到任何第三方(包括本项目作者)。</div>
+  <div class="hint" data-i18n="keyHint">The backend forwards your key to the selected provider; it does not persist the key.</div>
 
-  <h2>4. 测试连接</h2>
-  <button id="testBtn" class="primary">发送一次 ping 测试</button>
-  <div id="testStatus"></div>
+  <h2 data-i18n="testSection">4. Test connection</h2>
+  <button id="testBtn" class="primary" data-i18n="test">Send a test request</button>
+  <div id="testStatus" role="status" aria-live="polite"></div>
 
   <div class="actions">
-    <button id="saveBtn" class="primary">保存</button>
-    <button id="clearBtn">清除 API Key</button>
+    <button id="saveBtn" class="primary" data-i18n="save">Save</button>
+    <button id="clearBtn" data-i18n="clear">Clear API key</button>
   </div>
 
   <div class="footer">
-    <p>Open-PaperKid · MIT License · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid" target="_blank">GitHub</a> · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/PRIVACY.md" target="_blank">隐私政策</a></p>
+    <p>Open-PaperKid · MIT License · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid" target="_blank">GitHub</a> · <a href="https://github.com/AshleyLi-shiya/Open-PaperKid/blob/main/docs/PRIVACY.md" target="_blank" data-i18n="privacy">Privacy policy</a></p>
   </div>
 
   <script type="module" src="options.js"></script>

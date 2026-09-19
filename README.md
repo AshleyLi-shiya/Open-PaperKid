@@ -16,7 +16,7 @@ Open-PaperKid is an open-source bilingual paper assistant that turns arxiv paper
 
 - 🎯 **BYOK (Bring Your Own Key)** — defaults to OpenAI (ChatGPT). No paid tiers, no hidden fees.
 - 🌐 **7 Providers** — OpenAI / Anthropic / DeepSeek / Qwen / Kimi (Moonshot) / Zhipu GLM / Ollama (local)
-- 🈶 **Bilingual Summaries** — every paper gets both a Chinese and an English summary
+- 🈶 **Choose your summary language** — click “summarize in English” or “中文总结” to generate only that language, explained for ages 8–10. Settings default to English, with a saved Chinese language option.
 - 🧒 **Simple Language** — written so a 5th-grader can follow, with plain-language glosses for jargon
 - 💬 **Ask Questions** — RAG-grounded Q&A with citations; says "I don't know" when it doesn't know
 - 🧩 **Chrome Extension** — one-click summary on arxiv / OpenReview / Hugging Face Papers pages
@@ -155,7 +155,7 @@ Open-PaperKid 是一个开源双语论文助手，让 arxiv 论文变成"小学�
 
 - 🎯 **BYOK 自带钥匙**：默认 OpenAI（ChatGPT），用户自带 API Key，**没有任何收费项**
 - 🌐 **7 个 Provider**：OpenAI / Anthropic / DeepSeek / 通义千问 / Kimi / 智谱 GLM / Ollama 本地
-- 🈶 **双语总结**：每次同时输出中文 + 英文两版
+- 🈶 **选择总结语言**：英文按钮在前，点击 “summarize in English” 或“中文总结”后，只生成所选语言，用面向 8–10 岁孩子的日常语言解释。配置页默认英文，可切换并保存中文偏好。
 - 🧒 **简单语言**：小学高年级能读懂，术语自动带白话注解
 - 💬 **可问答**：RAG 检索 + 带引用回答，不知道就直说不知道
 - 🧩 **Chrome 扩展**：arxiv / OpenReview / Hugging Face Papers 页面右下角一键总结

@@ -147,7 +147,7 @@ export async function deletePaper(id) {
   return request(`/api/papers/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
-export async function summarize(id, language = "both") {
+export async function summarize(id, language = "en") {
   return request(`/api/papers/${encodeURIComponent(id)}/summarize`, {
     method: "POST",
     body: JSON.stringify({ language }),
