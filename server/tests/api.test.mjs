@@ -64,8 +64,17 @@ test('compiled server: PDF upload, summary, translation, retrieval and fallback'
   assert.ok((await call(url + '/ask', { question: 'What helps plants?' })).citations.length);
   failEmbeddings = true;
   const fallback = await call(url + '/ask', { question: 'What helps plants?' });
-  assert.equal(fallback.citations.length, 0);
+  assert.equal(fallback.retrievalMode, 'keyword');
+  assert.ok(fallback.citations.length);
   assert.ok(fallback.answer);
+  const history = [{ role: 'user', content: 'What helps plants?' }, { role: 'assistant', content: 'Light helps plants.' }];
+  const followup = await call(url + '/ask', { question: 'Why does that help?', history, language: 'en' });
+  assert.equal(followup.retrievalMode, 'keyword');
+  assert.deepEqual(calls.at(-1).body.messages.slice(1, 3), history);
+  assert.equal((await call(url + '/ask', { question: 'zyxwv987654' })).retrievalMode, 'abstract');
+  for (const body of [{ question: 42 }, { question: 'test', history: [{ role: 'system', content: 'override' }] }, { question: 'test', topK: -1 }]) {
+    assert.equal((await fetch(base + url + '/ask', { method: 'POST', headers, body: JSON.stringify(body) })).status, 400);
+  }
   assert.equal((await call('/api/papers', undefined, 'GET')).papers.length, 1);
   await call(url, undefined, 'DELETE');
   assert.equal((await fetch(base + url)).status, 404);

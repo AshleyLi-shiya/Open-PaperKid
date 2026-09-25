@@ -161,10 +161,10 @@ export async function translatePaper(id, targetLanguage) {
   });
 }
 
-export async function ask(id, question, language = "zh") {
+export async function ask(id, question, language = "en", history = []) {
   return request(`/api/papers/${encodeURIComponent(id)}/ask`, {
     method: "POST",
-    body: JSON.stringify({ question, language }),
+    body: JSON.stringify({ question, language, history }),
   });
 }
 

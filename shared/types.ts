@@ -85,9 +85,11 @@ export interface AskRequest {
   language: "zh" | "en";
   // Top-k chunks to retrieve before answering.
   topK?: number;
+  history?: { role: "user" | "assistant"; content: string }[];
 }
 
 export interface AskResult {
+  retrievalMode?: "semantic" | "keyword" | "abstract";
   paperId: string;
   question: string;
   answer: string;

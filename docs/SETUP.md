@@ -1,6 +1,8 @@
 # 快速上手
 
-Open-PaperKid v0.2 起采用 **BYOK**(用户自带 Key)模式。服务端**永不**保存你的 API Key,Key 只在你浏览器的 `chrome.storage.local` 里。
+第一次使用建议先阅读 [中英文上手指南](QUICKSTART.md)。
+
+Open-PaperKid 采用 **BYOK**（用户自带 Key）模式。Key 保存在浏览器，并通过后端转发给所选模型服务商；后端不主动持久保存 Key。云模型会接收论文片段和问题，API 可能收费。
 
 ## 三种用户路径
 

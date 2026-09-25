@@ -40,8 +40,13 @@ do not establish actual model readability.
   legacy PDF.js/Node Buffer slice mismatch that caused valid uploads to fail.
 - Single-line section headings and leading PDF blank lines no longer lose the
   abstract. Unstructured papers supply body text to the summary prompt.
-- Q&A falls back to the abstract if query embedding fails, even after the paper
-  was successfully indexed earlier.
+- Q&A falls back to keyword matching over paper text when embeddings fail;
+  only when no match is found does it use the abstract. The UI labels the mode.
+- Follow-up questions include at most three completed turns. Tests cover
+  clearing history, switching papers and ignoring stale replies.
+- Retrieval indexes are isolated by embedding endpoint/model, validate vector
+  dimensions, and are evicted on deletion. Unit tests cover model changes,
+  malformed embeddings, Chinese keyword matching and section aliases.
 - CI now runs the tests and fails on extension syntax errors.
 
 ## Verification limits

@@ -8,6 +8,8 @@ function dom(html) {
   const elements = {};
   function element() {
     return { value: '', type: 'password', style: {}, options: [], children: [], listeners: {},
+      scrollIntoView() {},
+      querySelector() { return this.answer || (this.answer = element()); },
       addEventListener(name, fn) { this.listeners[name] = fn; },
       appendChild(child) { this.children.push(child); this.options.push(child); },
       set innerHTML(value) { this.html = value; this.children = []; }, get innerHTML() { return this.html; } };
@@ -42,6 +44,41 @@ test('settings default to English and persist Chinese without changing provider 
   await vm.runInContext('languageWrite', page.context);
   await page.elements.saveBtn.listeners.click();
   assert.match(page.elements.testStatus.textContent, /Saved/i);
+});
+
+test('panel sends bounded follow-up history and clears it across papers or pending replies', async () => {
+  const { elements, document } = dom(await read('sidepanel/sidepanel.html'));
+  const requests = []; let resolvePending;
+  const context = vm.createContext({ document,
+    ask: async (id, question, language, history) => {
+      requests.push({ id, question, history: structuredClone(history) });
+      if (question === 'pending') return new Promise(resolve => { resolvePending = resolve; });
+      return { answer: 'Water helps roots.', citations: [], retrievalMode: 'keyword' };
+    },
+    chrome: { runtime: { onMessage: { addListener() {} }, sendMessage: async () => ({}) } } });
+  await vm.runInContext((await read('sidepanel/sidepanel.js')).replace(/^import .*;\n/gm, ''), context);
+  vm.runInContext('showResult({ paper: { id: "one", title: "Plants" } })', context);
+  for (let i = 0; i < 5; i++) {
+    elements.question.value = `question ${i}`;
+    await elements.askBtn.listeners.click();
+  }
+  assert.equal(requests[0].history.length, 0);
+  assert.equal(requests[1].history.length, 2);
+  assert.equal(requests[4].history.length, 6);
+  assert.match(elements.qaLog.children.at(-1).answer.innerHTML, /keyword matches/);
+  elements.question.value = 'pending';
+  const old = elements.askBtn.listeners.click();
+  await elements.askBtn.listeners.click();
+  assert.equal(requests.length, 6, 'double clicks must not send concurrent questions');
+  elements.clearLog.listeners.click();
+  resolvePending({ answer: 'stale', citations: [] }); await old;
+  assert.equal(elements.qaLog.children.length, 0);
+  elements.question.value = 'new question'; await elements.askBtn.listeners.click();
+  assert.equal(requests.at(-1).history.length, 0);
+  vm.runInContext('showResult({ paper: { id: "two", title: "Another paper" } })', context);
+  await elements.askBtn.listeners.click();
+  assert.equal(requests.at(-1).history.length, 0);
+  assert.equal(requests.at(-1).id, 'two');
 });
 
 test('panel generates only selected language, renders one legacy language, and ignores stale requests', async () => {

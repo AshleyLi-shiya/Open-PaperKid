@@ -7,7 +7,7 @@ import { storage } from "../services/storage.js";
 import { summarize } from "../services/summarize.js";
 import { translate } from "../services/translate.js";
 import { ask } from "../services/qa.js";
-import { buildIndex } from "../services/rag.js";
+import { buildIndex, clearIndexes } from "../services/rag.js";
 import { PROVIDERS, PROVIDER_ORDER, validateProvider } from "../services/llm.js";
 import { providerFromRequest, safeErrorMessage } from "../services/providerContext.js";
 import type { Paper, SummaryRequest, TranslateRequest, AskRequest } from "../../../shared/types.js";
@@ -92,6 +92,7 @@ async function ingestArxivPaper(arxivId: string, titleOverride?: string) {
   const paper: Paper = { metadata, fullText: "" };
   paper.fullText = buildFullText(paper);
   await storage.writePaper(id, paper);
+  clearIndexes(id);
   return paper;
 }
 
@@ -112,6 +113,7 @@ async function ingestLocalFile(absPath: string, titleOverride?: string) {
   const paper: Paper = { metadata, fullText: "" };
   paper.fullText = buildFullText(paper);
   await storage.writePaper(id, paper);
+  clearIndexes(id);
   return paper;
 }
 
@@ -162,6 +164,7 @@ papersRouter.post("/papers/ingest-local-upload", async (req, res) => {
     const paper: Paper = { metadata, fullText: "" };
     paper.fullText = buildFullText(paper);
     await storage.writePaper(id, paper);
+    clearIndexes(id);
     try {
       const ctx = providerFromRequest(req);
       await buildIndex(paper, ctx.client);
@@ -194,6 +197,7 @@ papersRouter.get("/papers/:id", async (req, res) => {
 papersRouter.delete("/papers/:id", async (req, res) => {
   try {
     await storage.deletePaper(req.params.id);
+    clearIndexes(req.params.id);
     res.json({ ok: true });
   } catch (e: unknown) {
     res.status(500).json({ error: safeErrorMessage(e) });
@@ -232,7 +236,9 @@ papersRouter.post("/papers/:id/translate", async (req, res) => {
 
 papersRouter.post("/papers/:id/ask", async (req, res) => {
   const body = req.body as Partial<AskRequest>;
-  if (!body.question) return res.status(400).json({ error: "question required" });
+  if (typeof body.question !== "string" || !body.question.trim() || body.question.length > 4000) return res.status(400).json({ error: "question must contain 1–4000 characters" });
+  if (body.history !== undefined && (!Array.isArray(body.history) || body.history.length > 6 || body.history.some(m => !m || !["user", "assistant"].includes(m.role) || typeof m.content !== "string" || m.content.length > 4000))) return res.status(400).json({ error: "history must contain at most 6 user/assistant messages of up to 4000 characters" });
+  if (body.topK !== undefined && (!Number.isInteger(body.topK) || body.topK < 1 || body.topK > 10)) return res.status(400).json({ error: "topK must be an integer from 1 to 10" });
   try {
     const ctx = providerFromRequest(req);
     const result = await ask(req.params.id, {
@@ -240,6 +246,7 @@ papersRouter.post("/papers/:id/ask", async (req, res) => {
       question: body.question,
       language: body.language ?? "zh",
       topK: body.topK,
+      history: body.history,
     }, ctx);
     res.json(result);
   } catch (e: unknown) {

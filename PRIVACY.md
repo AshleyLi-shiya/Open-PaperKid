@@ -1,83 +1,44 @@
-# Privacy Policy
+# Privacy and data flow
 
-_Last updated: 2026-09-19_
+Updated: 2026-09-25
 
-Open-PaperKid is an open-source, BYOK (Bring Your Own Key) paper assistant. This document explains what data we collect and what we don't.
+PaperKid is self-hosted software. There is no built-in analytics, central PaperKid account service or telemetry.
+Your backend operator and selected model provider can process the data you send them.
 
-## TL;DR
+## What is stored or transmitted?
 
-- ✅ Your **API key** stays in your browser only.
-- ✅ Your **papers** stay on **your** server only.
-- ❌ We have **no central server**, **no telemetry**, **no analytics**.
-- ❌ We have **no user accounts** and **no email collection**.
+| Data | Storage and transmission |
+| --- | --- |
+| API key and settings | Stored in Chrome local storage. The extension sends credentials to your configured backend, which forwards them to the selected provider. The backend does not intentionally persist keys. |
+| Uploaded PDFs and extracted text | Stored on the configured backend under its storage directory. |
+| Text used for generation or embeddings | Sent to the configured model endpoint. Cloud endpoints receive these excerpts. |
+| Questions and recent conversation | Sent through the backend to the selected model provider. The open panel retains up to three completed turns for follow-ups. |
+| Current paper and summary | Kept in Chrome session storage for panel restoration. |
+| Retrieval vectors | Cached in backend memory, bounded to 32 paper/provider index entries. Rebuilt after restart. |
 
-## What lives where
+Model-provider retention and training policies depend on the endpoint and account you choose.
+Self-hosting the backend does not make cloud inference local.
+For local model processing, use a local Ollama endpoint; downloading papers and model weights still involves network access.
 
-| Data | Where |
-|------|-------|
-| API key (`sk-…`) | Your browser's `chrome.storage.local` only. Never sent anywhere except your configured Open-PaperKid server as a per-request header. |
-| Paper PDFs you upload | Your local Open-PaperKid server (`.open-paperkid-data/pdfs/`). |
-| Extracted text + RAG vectors | Your local Open-PaperKid server (`.open-paperkid-data/papers/`). |
-| Summaries / Q&A history | Your local Open-PaperKid server (`.open-paperkid-data/papers/<id>/`). |
-| LLM API calls | Sent from your server to your chosen provider (OpenAI / Anthropic / DeepSeek / Ollama). Subject to that provider's own privacy policy. |
+## Logs and deployment
 
-## What the Open-PaperKid server logs
+The application does not intentionally log API keys or request bodies and includes error-redaction safeguards.
+These are not a guarantee against all disclosure. A proxy, hosting provider or custom endpoint may have its own logs.
 
-By default, the server logs:
+The backend has no user authentication or per-user storage isolation. Keep it on a private, trusted machine/network.
+Do not expose it directly to the public internet. Remote deployments need authentication, HTTPS and restricted access.
+Use a backend and model endpoint you trust.
 
-- HTTP method + path
-- Response status code
-- Latency in milliseconds
-- Provider name (e.g. `openai`) — never the key
+## Your controls
 
-It does **not** log:
-- Request bodies (which may contain paper content or questions)
-- API keys
-- Paper IDs in association with users (we don't know who you are)
+- Clear your API key from extension settings.
+- Clear the panel's conversation with **Clear history**; switching papers also clears it.
+- Delete an imported paper through the backend API to remove its stored paper data and uploaded PDF copy.
+- Clearing extension storage removes saved settings and session results. Keep a copy of any settings you need.
+- Contact your model provider separately about data they received; local deletion cannot retract prior requests.
 
-## Subprocessors
+Do not put secrets, sensitive papers or personal information in public bug reports.
+This project is a general-purpose reading aid, not a service designed specifically for children.
 
-When you use a hosted provider (OpenAI / Anthropic / DeepSeek), they become a subprocessor of your data. Their privacy policies apply to the data they receive:
-
-- [OpenAI Privacy Policy](https://openai.com/privacy)
-- [Anthropic Privacy Policy](https://www.anthropic.com/privacy)
-- [DeepSeek Privacy Policy](https://www.deepseek.com/privacy)
-
-If you use Ollama (local), no third party receives your data.
-
-## Chrome extension permissions
-
-The extension requests these permissions, used only as described:
-
-- `storage` — store your API key and preferences locally.
-- `sidePanel` — show the Q&A UI alongside paper pages.
-- `contextMenus` — "Summarize with Open-PaperKid" right-click menu on arxiv links.
-- `activeTab`, `scripting` — inject the summarize button on paper pages.
-- Host permissions for `arxiv.org`, `openreview.net`, `huggingface.co/papers`, `localhost`, `127.0.0.1` — for fetching pages and talking to your local server.
-
-The extension does **not**:
-- Read your browsing history outside the paper pages you visit.
-- Send data to any server other than the one you configure.
-
-## Your rights
-
-Because we have no central server:
-- **No "delete my account"** — there is no account.
-- **No data export from us** — all your data is on your own disk. You can `rm -rf .open-paperkid-data` at any time.
-- **No data portability from us** — same as above.
-
-## Children's privacy
-
-Open-PaperKid does not knowingly target children under 13. Since we collect no data, COPPA / GDPR-K compliance is achieved by construction.
-
-## Changes to this policy
-
-This is an open-source project. Any change to this policy will be:
-
-1. Committed to this repository with a clear commit message.
-2. Listed in the GitHub Releases.
-3. Effective on the date noted at the top of this file.
-
-## Contact
-
-For privacy questions, open a GitHub issue or email lishiyaya@gmail.com.
+See the extension manifest for the exact browser permissions.
+Questions: open a repository issue without including private data.

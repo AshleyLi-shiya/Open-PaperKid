@@ -62,7 +62,7 @@ export function chunkText(text: string, opts: { sectionTitle?: string; maxTokens
           }
           if (stTokens > maxTokens) {
             // Last resort: hard-cut.
-            const stride = maxTokens * 4;
+            const stride = maxTokens;
             for (let i = 0; i < st.length; i += stride) {
               chunks.push({
                 text: st.slice(i, i + stride),
@@ -94,6 +94,14 @@ export function chunkText(text: string, opts: { sectionTitle?: string; maxTokens
 
 export function truncateByTokens(text: string, maxTokens: number): string {
   if (estimateTokens(text) <= maxTokens) return text;
-  // Crude: keep first maxTokens*4 chars.
-  return text.slice(0, maxTokens * 4) + "…";
+  // Reserve room for the ellipsis; handle CJK instead of assuming 4 chars/token.
+  let low = 0;
+  let high = text.length;
+  const budget = Math.max(0, maxTokens - 1);
+  while (low < high) {
+    const mid = Math.ceil((low + high) / 2);
+    if (estimateTokens(text.slice(0, mid)) <= budget) low = mid;
+    else high = mid - 1;
+  }
+  return text.slice(0, low) + "…";
 }

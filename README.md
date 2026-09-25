@@ -1,243 +1,131 @@
-# Open-PaperKid
+# PaperKid
+### Understand the idea, not just a shorter abstract.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/AshleyLi-shiya/Open-PaperKid/actions/workflows/ci.yml/badge.svg)](https://github.com/AshleyLi-shiya/Open-PaperKid/actions/workflows/ci.yml)
-[![Docker](https://img.shields.io/badge/Docker-open--paperkid--server-blue?logo=docker)](docs/DEPLOY.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-<p>
-<details open>
-<summary><b>English</b></summary>
+An open-source Chrome paper-reading assistant for curious readers outside their field.
+Get a plain-language explanation, then ask about the part that still doesn't make sense.
 
-<br>
+**Free software, not free cloud inference:** bring your own model API key (provider fees may apply), or use a local Ollama model. A running backend is required.
 
-Open-PaperKid is an open-source bilingual paper assistant that turns arxiv papers into explanations a middle-schooler can understand.
+[Install & read your first paper](docs/QUICKSTART.md) · [中文上手](docs/QUICKSTART.md#中文上手) · [Privacy](PRIVACY.md) · [Report a confusing explanation](https://github.com/AshleyLi-shiya/Open-PaperKid/issues)
 
-## ✨ Key Features
+## What it helps you understand
 
-- 🎯 **BYOK (Bring Your Own Key)** — defaults to OpenAI (ChatGPT). No paid tiers, no hidden fees.
-- 🌐 **7 Providers** — OpenAI / Anthropic / DeepSeek / Qwen / Kimi (Moonshot) / Zhipu GLM / Ollama (local)
-- 🈶 **Choose your summary language** — click “summarize in English” or “中文总结” to generate only that language, explained for ages 8–10. Settings default to English, with a saved Chinese language option.
-- 🧒 **Simple Language** — written so a 5th-grader can follow, with plain-language glosses for jargon
-- 💬 **Ask Questions** — RAG-grounded Q&A with citations; says "I don't know" when it doesn't know
-- 🧩 **Chrome Extension** — one-click summary on arxiv / OpenReview / Hugging Face Papers pages
-- 📚 **Local PDFs** — upload your own PDFs; fully self-hostable
-- 🔐 **Privacy First** — API keys live only in your browser's local storage; the server never persists or logs them
-- 🪪 **MIT Licensed** — auditable, modifiable, commercial-friendly
+- **The problem:** what are the researchers trying to fix?
+- **The old way:** what did people try before?
+- **The new idea:** how does it work, step by step?
+- **The evidence:** what happened, and what remains uncertain?
 
-## Quick Start
+Choose **summarize in English** or **中文总结**. Only your selected language is generated.
+The explanation aims for everyday words and short sentences suitable for ages 8–10.
+This is a writing goal, not a validated reading-age guarantee. Check important claims against the paper.
 
-Runtime fixes and repeatable smoke tests are documented in [docs/TESTING.md](docs/TESTING.md).
+## Read, ask, check
 
-```bash
-# 1. Clone the repo
+1. Open an arXiv abstract page, or upload a text-based PDF through the extension popup.
+2. Choose a summary language.
+3. Ask a question, then follow up: “Why does that help?”
+4. Check the retrieved excerpts below the answer.
+
+The panel keeps the last three completed question/answer pairs while it stays open.
+Switching papers or clearing the chat resets them. Each answer shows whether it used semantic retrieval,
+keyword matches, or only the abstract. Excerpts are supporting context, not verified claim-by-claim citations.
+
+## Why use PaperKid?
+
+- Read alongside your paper in a Chrome side panel.
+- Choose your model provider or an OpenAI-compatible endpoint.
+- Run the backend yourself; use local Ollama inference if desired.
+- Inspect and change the code under the MIT license.
+
+This is not a claim of better accuracy than ChatPDF or other assistants.
+If you want a hosted tool with no setup, the current self-hosted workflow may not fit you.
+
+## First-time setup
+
+Requires **Node.js 20+**, Chrome, and either a provider API key or a running Ollama model.
+
+```sh
 git clone https://github.com/AshleyLi-shiya/Open-PaperKid.git
-cd Open-PaperKid
-
-# 2. Start the backend (Node 20+)
-cd server && npm install && npm run dev
-
-# 3. Install the Chrome extension
-# chrome://extensions → Developer mode → Load unpacked → select chrome-extension/
-
-# 4. Enter your API key in the extension settings
-#    (OpenAI by default, switchable to other providers)
-
-# 5. Open any arxiv paper and click the 📘 icon at the bottom-right
+cd Open-PaperKid/server
+npm ci
+npm run build
+npm start
 ```
 
-For detailed setup, CLI and Docker deployment, see [docs/SETUP.md](docs/SETUP.md).
+Leave that terminal running. In Chrome, open `chrome://extensions`, enable Developer mode,
+click **Load unpacked**, and select the repository's **chrome-extension** folder.
 
-## Supported Providers
+Open the extension's **Options**, configure the provider, and run **Send a test request**.
+The **Backend API URL** is `http://localhost:5174`; the **Provider Base URL** is a separate setting.
+For custom providers, enter a model available to your account rather than assuming the suggested model is available.
 
-| Provider | Type | API Key | Recommended Model |
-|----------|------|---------|-------------------|
-| **OpenAI** | Cloud | ✅ | `gpt-4o-mini` |
-| **Anthropic** | Cloud | ✅ | `claude-3-5-sonnet-latest` |
-| **DeepSeek** | Cloud | ✅ | `deepseek-chat` |
-| **Qwen** | Cloud | ✅ | `qwen-plus-latest` |
-| **Kimi (Moonshot)** | Cloud | ✅ | `moonshot-v1-8k` |
-| **Zhipu GLM** | Cloud | ✅ | `glm-4-flash` |
-| **Ollama** | Local, free | ❌ | `qwen2.5:7b` |
+Then open an arXiv abstract page or upload a local PDF. See the [step-by-step guide and troubleshooting](docs/QUICKSTART.md).
 
-> **Note:** RAG Q&A requires embeddings. OpenAI and Ollama natively support embeddings; other providers are best used for summarization/translation.
+## Supported connections
 
-## REST API
+OpenAI · Anthropic · DeepSeek · Qwen · Kimi · GLM · Ollama
 
-```
-GET    /api/health                    # health check
-GET    /api/providers                 # list supported providers
-POST   /api/providers/validate        # test provider connectivity
-GET    /api/papers                    # list ingested papers
-POST   /api/papers/ingest             { arxivId | filePath }
-POST   /api/papers/ingest-local-upload { filename, b64 }
-POST   /api/papers/:id/summarize      { language: zh | en | both }
-POST   /api/papers/:id/translate      { targetLanguage: zh | en }
-POST   /api/papers/:id/ask            { question, language }
-DELETE /api/papers/:id
-```
+An OpenAI-compatible chat endpoint does not necessarily support embeddings.
+If semantic retrieval fails, PaperKid tries keyword matching against the paper text.
+If nothing matches, it uses only the abstract and labels that limitation.
 
-Every LLM request must include these headers (the Chrome extension sends them automatically):
+## Current limits
 
-```
-X-Paperkid-Provider: openai | anthropic | deepseek | qwen | kimi | glm | ollama
-X-Paperkid-Api-Key:  sk-xxx          # required for cloud providers
-X-Paperkid-Base-Url: https://...     # optional, for Ollama or custom proxies
-X-Paperkid-Model:    gpt-4o-mini     # optional, falls back to recommended model
-```
+- Manual Chrome installation and a running backend are required.
+- Summaries use selected, budget-limited excerpts, not an exhaustive review of every page.
+- PDF text extraction can struggle with scanned pages, formulas, tables and multi-column layouts; no OCR is included.
+- Simple explanations can still be wrong or omit nuance. This is a reading aid, not a replacement for the paper.
+- No live-model quality benchmark or independently validated reading-age result is published yet.
+- The backend has no user authentication. Keep it private; do not expose it directly to the public internet.
 
-## Project Structure
+## Data and cost
 
-```
-Open-PaperKid/
-├── README.md              # you are here
-├── LICENSE                # MIT
-├── docker-compose.yml     # one-command local deployment (optional Ollama)
-├── .github/workflows/     # CI
-├── docs/                  # architecture, setup, deployment, privacy, security
-├── shared/types.ts        # shared types between server and extension
-├── server/                # Node + TypeScript backend
-│   ├── src/
-│   │   ├── index.ts       # Express entry (CORS, rate limit, health check)
-│   │   ├── cli.ts         # CLI tool
-│   │   ├── config.ts
-│   │   ├── prompts/       # ⭐ bilingual simple-language prompts
-│   │   ├── routes/        # REST API
-│   │   ├── services/
-│   │   │   ├── llm.ts          # ⭐ multi-provider registry
-│   │   │   ├── providerContext.ts  # per-request provider resolution
-│   │   │   ├── pdfParser.ts
-│   │   │   ├── arxiv.ts
-│   │   │   ├── rag.ts
-│   │   │   ├── summarize.ts
-│   │   │   ├── translate.ts
-│   │   │   ├── qa.ts
-│   │   │   └── storage.ts
-│   │   └── utils/
-│   ├── Dockerfile
-│   └── package.json
-└── chrome-extension/      # MV3, no build step
-    ├── manifest.json
-    ├── popup/             # popup
-    ├── sidepanel/         # side panel (Q&A UI)
-    ├── options/           # ⭐ settings (provider + key)
-    ├── content/           # injected into arxiv etc.
-    └── background/        # service worker
+Your API key is stored in Chrome and sent through your configured backend to your selected provider.
+The backend does not intentionally persist keys. Cloud providers receive paper excerpts, questions and recent conversation context.
+Uploaded PDFs and extracted text are stored on your backend. Local-only model processing requires a local endpoint.
+There is no built-in analytics or PaperKid subscription. See [Privacy](PRIVACY.md).
+
+## Help make explanations better
+
+Bring a paper you actually want to understand. Tell us:
+1. Which explanation helped something click?
+2. Which sentence was still confusing or inaccurate?
+3. What would make you use this again?
+
+Please include the paper link, model and language, but **never post API keys or private papers**.
+See [the evaluation checklist](docs/EVALUATION.md) for a reproducible comparison.
+
+## For developers
+
+The existing architecture stays small: a plain JavaScript MV3 extension, a Node/TypeScript backend,
+JSON-on-disk paper storage and an in-memory retrieval index.
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [CLI and advanced setup](docs/SETUP.md)
+- [Deployment](docs/DEPLOY.md) — review authentication and network access before hosting.
+- [Tests](docs/TESTING.md)
+- [Contributing](CONTRIBUTING.md)
+
+```sh
+cd server
+npm ci
+npm test
 ```
 
-## Privacy & Security
+## 中文说明
 
-Open-PaperKid is BYOK by design:
+PaperKid 想做的不是“把论文缩短”，而是帮你弄懂其中的原理。支持 Chrome 侧边栏、本地 PDF 上传、
+中英文单语言总结和连续追问。配置页面默认英文，可切换中文。
 
-- API keys live only in your browser (`chrome.storage.local`); the server never persists or logs them.
-- Server logs are sanitized — `sk-...` tokens are stripped from error messages.
-- Uploaded papers stay on your own server at `./.open-paperkid-data`.
+软件免费开源，但云模型 API 可能收费；也可以使用本地 Ollama。
+目前需要自己启动后端并手动加载扩展，不是免安装的在线服务。
+讲解以 8–10 岁读者能理解的日常表达为目标，但尚未通过真实读者测试验证，重要结论请核对原文。
 
-See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
-
-## Contributing
-
-Issues and PRs are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) first.
+使用云端模型时，论文片段和问题会发给所选服务商，并非“内容永不离开本机”。
+[中文安装步骤](docs/QUICKSTART.md#中文上手) · [隐私说明](PRIVACY.md)
 
 ## License
-
 MIT — see [LICENSE](LICENSE).
-
-</details>
-
-<details>
-<summary><b>中文说明</b></summary>
-
-<br>
-
-Open-PaperKid 是一个开源双语论文助手，让 arxiv 论文变成"小学生都能懂"的讲解。
-
-## ✨ 核心特点
-
-- 🎯 **BYOK 自带钥匙**：默认 OpenAI（ChatGPT），用户自带 API Key，**没有任何收费项**
-- 🌐 **7 个 Provider**：OpenAI / Anthropic / DeepSeek / 通义千问 / Kimi / 智谱 GLM / Ollama 本地
-- 🈶 **选择总结语言**：英文按钮在前，点击 “summarize in English” 或“中文总结”后，只生成所选语言，用面向 8–10 岁孩子的日常语言解释。配置页默认英文，可切换并保存中文偏好。
-- 🧒 **简单语言**：小学高年级能读懂，术语自动带白话注解
-- 💬 **可问答**：RAG 检索 + 带引用回答，不知道就直说不知道
-- 🧩 **Chrome 扩展**：arxiv / OpenReview / Hugging Face Papers 页面右下角一键总结
-- 📚 **本地 PDF**：支持本地上传与私有部署
-- 🔐 **零隐私泄露**：API Key 只存在浏览器 `chrome.storage.local`，服务端永不记录
-- 🪪 **MIT 开源**：可审计、可修改、可商用
-
-## 快速开始
-
-```bash
-# 1. 克隆仓库
-git clone https://github.com/AshleyLi-shiya/Open-PaperKid.git
-cd Open-PaperKid
-
-# 2. 启动后端（Node 20+）
-cd server && npm install && npm run dev
-
-# 3. 安装 Chrome 扩展
-# chrome://extensions → 开发者模式 → 加载已解压的扩展程序 → 选 chrome-extension/
-
-# 4. 在扩展设置页填入你的 API Key（默认 OpenAI，可切换其他 Provider）
-
-# 5. 打开任意 arxiv 论文页，点右下角 📘 图标
-```
-
-更详细的上手、命令行与 Docker 部署见 [docs/SETUP.md](docs/SETUP.md)。
-
-## 支持的模型 Provider
-
-| Provider | 类型 | 需要 API Key | 推荐模型 |
-|----------|------|--------------|----------|
-| **OpenAI** | 商业 | ✅ | `gpt-4o-mini` |
-| **Anthropic** | 商业 | ✅ | `claude-3-5-sonnet-latest` |
-| **DeepSeek** | 商业 | ✅ | `deepseek-chat` |
-| **通义千问 Qwen** | 商业 | ✅ | `qwen-plus-latest` |
-| **Kimi (Moonshot)** | 商业 | ✅ | `moonshot-v1-8k` |
-| **智谱 GLM** | 商业 | ✅ | `glm-4-flash` |
-| **Ollama** | 本地免费 | ❌ | `qwen2.5:7b` |
-
-> **注意**：RAG 问答需要 Embedding。OpenAI 与 Ollama 原生支持 Embedding；其他 Provider 目前主要用于总结/翻译。
-
-## REST API
-
-```
-GET    /api/health                    # 健康检查
-GET    /api/providers                 # 列出支持的 Provider
-POST   /api/providers/validate        # 测试 Provider 连通性
-GET    /api/papers                    # 已导入的论文列表
-POST   /api/papers/ingest             { arxivId | filePath }
-POST   /api/papers/ingest-local-upload { filename, b64 }
-POST   /api/papers/:id/summarize      { language: zh | en | both }
-POST   /api/papers/:id/translate      { targetLanguage: zh | en }
-POST   /api/papers/:id/ask            { question, language }
-DELETE /api/papers/:id
-```
-
-每次 LLM 请求需要以下 headers（Chrome 扩展会自动带上）：
-
-```
-X-Paperkid-Provider: openai | anthropic | deepseek | qwen | kimi | glm | ollama
-X-Paperkid-Api-Key:  sk-xxx          # 商业 Provider 必填
-X-Paperkid-Base-Url: https://...     # 可选，用于 Ollama 或自定义代理
-X-Paperkid-Model:    gpt-4o-mini     # 可选，留空使用推荐模型
-```
-
-## 隐私与安全
-
-Open-PaperKid 采用 **BYOK（Bring Your Own Key）** 设计：
-
-- API Key 只存储在浏览器 `chrome.storage.local`，**服务端不持久化、不打印日志**。
-- 服务端日志已脱敏，错误信息自动剥离 `sk-...` 等令牌。
-- 上传的论文保存在你自己的服务端 `./.open-paperkid-data`，不会传到任何第三方。
-
-详见 [PRIVACY.md](PRIVACY.md) 与 [SECURITY.md](SECURITY.md)。
-
-## 贡献
-
-欢迎 Issue 与 PR！请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
-
-## License
-
-MIT — 详见 [LICENSE](LICENSE)。
-
-</details>
-</p>

@@ -128,6 +128,7 @@ export interface ResolvedProvider {
 }
 
 export interface LlmClient {
+  readonly embeddingKey: string;
   chat(messages: ChatMessage[], opts?: ChatOptions): Promise<string>;
   embed(texts: string[]): Promise<number[][]>;
 }
@@ -197,6 +198,7 @@ export function createClientFor(resolved: ResolvedProvider): LlmClient {
 
 class OpenAICompatClient implements LlmClient {
   constructor(private opts: { baseUrl: string; apiKey: string; model: string }) {}
+  get embeddingKey(): string { return JSON.stringify(["openai-compatible", this.opts.baseUrl, "text-embedding-3-small"]); }
 
   async chat(messages: ChatMessage[], o: ChatOptions = {}): Promise<string> {
     const res = await fetch(`${this.opts.baseUrl}/chat/completions`, {
@@ -239,6 +241,7 @@ class OpenAICompatClient implements LlmClient {
 
 class AnthropicClient implements LlmClient {
   constructor(private opts: { apiKey: string; model: string }) {}
+  readonly embeddingKey = "anthropic:no-embeddings";
 
   async chat(messages: ChatMessage[], o: ChatOptions = {}): Promise<string> {
     if (!this.opts.apiKey) throw new Error("Anthropic provider requires an API key.");
@@ -272,6 +275,7 @@ class AnthropicClient implements LlmClient {
 
 class OllamaClient implements LlmClient {
   constructor(private opts: { baseUrl: string; chat: string; embed: string }) {}
+  get embeddingKey(): string { return JSON.stringify(["ollama", this.opts.baseUrl, this.opts.embed]); }
 
   async chat(messages: ChatMessage[], o: ChatOptions = {}): Promise<string> {
     const model = o.model || this.opts.chat;

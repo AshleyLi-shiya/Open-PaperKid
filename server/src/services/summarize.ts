@@ -5,10 +5,16 @@ import { targetLangs } from "../utils/language.js";
 import { truncateByTokens } from "../utils/chunk.js";
 import type { ProviderContext } from "./providerContext.js";
 
-function findSection(paper: Paper, name: string): string {
-  const target = name.toLowerCase();
-  const sec = paper.metadata.sections.find((s) => s.title.toLowerCase().includes(target));
-  return sec ? truncateByTokens(sec.text, 1500) : "";
+export function findSection(paper: Paper, name: string): string {
+  const aliases: Record<string, RegExp> = {
+    Introduction: /introduction|background|引言|绪论|背景/i,
+    Method: /method|approach|framework|architecture|方法|模型|框架/i,
+    Experiments: /experiment|evaluation|results|实验|评估|结果/i,
+    Conclusion: /conclu|discussion|limitation|结论|讨论|局限/i,
+  };
+  const sections = paper.metadata.sections.filter(s => (aliases[name] || new RegExp(name, "i")).test(s.title));
+  const budget = Math.floor(1500 / Math.max(1, sections.length));
+  return sections.map(s => `[${s.title}]\n${truncateByTokens(s.text, budget)}`).join("\n\n");
 }
 
 function safeParseJson(text: string): unknown {

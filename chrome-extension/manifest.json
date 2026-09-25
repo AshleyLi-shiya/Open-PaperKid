@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Open-PaperKid — 小学生都懂的论文助手",
+  "name": "PaperKid — Papers in plain language",
   "version": "0.2.0",
-  "description": "Bilingual simple-language paper assistant. Summarize, translate, and Q&A on academic papers. BYOK — your API key never leaves your browser.",
+  "description": "Understand papers in plain language. English or Chinese summaries, PDF uploads and follow-up questions. Requires your backend and model.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
